@@ -5,7 +5,7 @@
 import pytest
 
 from chen.exceptions import ValidationError
-from chen.model import Attribute, Diagram, Entity, Link, Relationship
+from chen.model import Attribute, Diagram, Entity, Link, Owner, Relationship, WeakEntity
 
 
 class TestE05RelacionamentoComMenosDeDuasEntidades:
@@ -60,6 +60,17 @@ class TestE08ClasseForaDoDiagrama:
 
         with pytest.raises(ValidationError, match="E08"):
             Diagram("Vendas", elements=[Cliente, Faz])
+
+    def test_owner_para_classe_fora_do_diagrama_levanta_E08(self):
+        class Forasteira(Entity):
+            numero = Attribute(primary_key=True)
+
+        class Item(WeakEntity):
+            codigo = Attribute(partial_key=True)
+            do_dono = Owner(Forasteira)
+
+        with pytest.raises(ValidationError, match="E08"):
+            Diagram("Vendas", elements=[Item])
 
 
 class TestCasoFelizValido:

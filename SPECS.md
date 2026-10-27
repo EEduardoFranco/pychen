@@ -482,6 +482,8 @@ de qualquer sessão é **seção 13 + seção 10**.
 | 2026-10-26 | Spec v0.1 criada — decisões de API, layout, escopo, roadmap | — |
 | 2026-10-26 | Spec v0.2 — Zen como filosofia (seção 1), TDD + venv (seção 11), playground (11.3), acompanhamento (11.4) | — |
 | 2026-10-26 | M0 executado pelo agente implementador (git, venv, pacote `chen/`, migração do protótipo) | Pendente: `.agent-playground/` no `.gitignore` e limpeza do `demo.dot` da raiz |
+| 2026-10-26 | Tag `v0.1.0` criada no fechamento do M1 | — |
+| 2026-10-26 | M2 iniciado — TDD camada model: flags de atributo, `WeakEntity`/`Owner` (E03/E04), `Composite`, participação total e atributos de relacionamento | — |
 | 2026-10-26 | HANDOFF.md removido (conteúdo incorporado ao trabalho); item pendente do M0 fechado; `SPECS.md` v0.2 commitado | M0 ✅ |
 | 2026-10-26 | M1 iniciado — TDD camada model: testes Red em `tests/model/` | — |
 | 2026-10-26 | M1 model ✅ — `__init_subclass__` + `__set_name__` (não metaclass explícita; decisão do handoff confirmada no código), ids por diagrama (nós e arestas dividem a sequência), E05/E06/E08 | commit `741c098` |

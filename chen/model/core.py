@@ -1,10 +1,14 @@
 """Diagram (spec §4–§5): grafo puro, sem SVG e sem graphviz.
 
 `Diagram(name, elements=[...])` recebe classes explicitamente (sem registro mágico)
-e instancia cópias: reutilizar a mesma classe `Entity` em dois diagrams cria nós
+e instancia cópias: reutilizar a mesma classe `Entity` em dois diagramas cria nós
 novos, com ids reiniciados por diagrama. A ordem dos ids é determinística: entidades
 e seus atributos na ordem da lista, depois relacionamentos, seus atributos e as
 arestas de link na ordem de declaração.
+
+Arestas: `attributed_to` (atributo → entidade | relacionamento | composto),
+`link` (relacionamento → entidade, com cardinalidade e participação total) e
+`owner` (dono → fraco: total, (1,1) por definição).
 """
 
 from __future__ import annotations
@@ -12,12 +16,14 @@ from __future__ import annotations
 from dataclasses import dataclass
 
 from chen.exceptions import ValidationError
-from chen.model.entities import Entity
-from chen.model.relationships import Relationship
+from chen.model.attributes import Composite
+from chen.model.entities import Entity, WeakEntity
+from chen.model.relationships import Owner, Relationship
 from chen.model.validate import validate_diagram
 
 ATTRIBUTED_TO = "attributed_to"
 LINK = "link"
+OWNER = "owner"
 
 
 class Identifier:
@@ -38,6 +44,7 @@ class Edge:
     head: int = 0
     kind: str = ""
     label: str | None = None
+    total: bool = False
 
 
 class Diagram:
@@ -50,7 +57,7 @@ class Diagram:
         self._build()
         validate_diagram(self)
 
-    def _new_node(self, node: Entity | Relationship) -> None:
+    def _new_node(self, node) -> None:
         node.obj_id = self._ids.next()
         self.nodes.append(node)
 
@@ -64,43 +71,88 @@ class Diagram:
 
         instances: dict[type, Entity] = {}
         for entity_class in entity_classes:
+            self._check_no_owner_on_strong(entity_class)
             instance = entity_class()
             instances[entity_class] = instance
             self._new_node(instance)
             self._copy_attributes(entity_class, instance)
+            if issubclass(entity_class, WeakEntity):
+                self._build_owners(entity_class, instance, instances)
 
         for relationship_class in relationship_classes:
             instance = relationship_class()
             self._new_node(instance)
             self._copy_attributes(relationship_class, instance)
-            self._build_links(relationship_class, instances)
+            self._build_links(relationship_class, instance, instances)
 
-    def _copy_attributes(self, cls: type, node: Entity | Relationship) -> None:
-        descriptors = getattr(cls, "__chen_attributes__", [])
-        for descriptor in descriptors:
+    def _check_no_owner_on_strong(self, entity_class: type) -> None:
+        if issubclass(entity_class, WeakEntity):
+            return
+        if any(isinstance(value, Owner) for value in vars(entity_class).values()):
+            raise ValidationError(
+                "E04",
+                f'"{entity_class.__name__}" is a strong entity and cannot declare Owner',
+            )
+
+    def _build_owners(self, entity_class: type, weak, instances: dict[type, Entity]) -> None:
+        for owner_descriptor in entity_class.__chen_owners__:
+            owner_instance = instances.get(owner_descriptor.target)
+            if owner_instance is None:
+                raise self._e08(owner_descriptor.target)
+            self._new_edge(
+                Edge(
+                    tail=owner_instance.obj_id,
+                    head=weak.obj_id,
+                    kind=OWNER,
+                    label="1,1",
+                    total=True,
+                )
+            )
+
+    def _copy_attributes(self, cls: type, node) -> None:
+        for descriptor in getattr(cls, "__chen_attributes__", []):
+            if isinstance(descriptor, Composite):
+                self._build_composite(descriptor, node)
+                continue
             attribute = descriptor.clone()
             self._new_node(attribute)
             node.attributes.append(attribute)
             self._new_edge(Edge(tail=attribute.obj_id, head=node.obj_id, kind=ATTRIBUTED_TO))
 
-    def _build_links(self, relationship_class: type, instances: dict[type, Entity]) -> None:
-        relationship = self.nodes[-1]
+    def _build_composite(self, descriptor: Composite, node) -> None:
+        composite = descriptor.to_node()
+        self._new_node(composite)
+        node.attributes.append(composite)
+        self._new_edge(Edge(tail=composite.obj_id, head=node.obj_id, kind=ATTRIBUTED_TO))
+        for sub_descriptor in descriptor.sub_attributes:
+            attribute = sub_descriptor.clone()
+            self._new_node(attribute)
+            composite.attributes.append(attribute)
+            self._new_edge(Edge(tail=attribute.obj_id, head=composite.obj_id, kind=ATTRIBUTED_TO))
+
+    def _build_links(
+        self, relationship_class: type, relationship, instances: dict[type, Entity]
+    ) -> None:
         for link in relationship_class.__chen_links__:
             entity = instances.get(link.target)
             if entity is None:
-                raise ValidationError(
-                    "E08",
-                    f"{relationship_class.__name__}.{link.field_name}: entity "
-                    f'"{link.target.__name__}" is not in the diagram elements',
-                )
+                raise self._e08(link.target)
             self._new_edge(
                 Edge(
                     tail=relationship.obj_id,
                     head=entity.obj_id,
                     kind=LINK,
                     label=link.cardinality,
+                    total=link.total,
                 )
             )
+
+    @staticmethod
+    def _e08(target: type) -> ValidationError:
+        return ValidationError(
+            "E08",
+            f'entity "{target.__name__}" referenced in Link/Owner is not in the diagram elements',
+        )
 
     def to_svg(self) -> str:
         """Renderiza o diagrama (spec §4). Render importa lazy: camada acima do model."""
