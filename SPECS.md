@@ -3,7 +3,7 @@
 > A "bíblia" do projeto. Toda decisão de design passa por aqui: se não está na spec,
 > ou entra na spec, ou não entra no código.
 
-Status: RASCUNHO v0.1 · Última atualização: 2026-10-26
+Status: v0.2 · Última atualização: 2026-10-26
 
 ---
 
@@ -25,6 +25,29 @@ Princípios:
    ordenação por `set()` ou dict de importação.
 4. **Erros bons.** Violações de notação Chen são erros de validação com mensagem clara,
    apontando o elemento culpado.
+
+### Filosofia — o Zen de Python (PEP 20)
+
+O **Zen de Python** (`import this`) é a constituição deste projeto. Quando duas opções de
+design empatarem tecnicamente, vence a mais alinhada com o Zen. Lema destilado:
+
+> **Simples e funcional é melhor do que complexo e difícil de ler.**
+
+Os aforismos que mais mandam aqui, já aplicados às decisões da spec:
+
+- *Beautiful is better than ugly.* — A declaração de um diagrama lê-se como a própria notação de Chen (seção 4).
+- *Explicit is better than implicit.* — Sem registro mágico: `Diagram(elements=[...])` é explícito; validação falha alto.
+- *Simple is better than complex.* — `subprocess` ao `dot` em vez de pygraphviz; fragmentos SVG em vez de framework de templates.
+- *Flat is better than nested.* — Pacote raso: `model` / `layout` / `render`, nada de camadas abstratas "para o futuro".
+- *Readability counts.* — Nomes de teste contam a regra (11.2); a spec lê-se como prosa, não como burocracia.
+- *Special cases aren't special enough to break the rules.* — Determinismo byte a byte vale para todo SVG, inclusive nos testes.
+- *Errors should never pass silently.* — Diagrama inválido nunca gera SVG (seção 6); skips são explícitos (11.2).
+- *There should be one — and preferably only one — obvious way to do it.* — Uma API oficial (seção 4), um runner (`pytest`).
+- *Now is better than never.* — Fatias verticais: o 0.1.0 renderiza, ainda que mínimo (seção 10).
+- *If the implementation is hard to explain, it's a bad idea.* — O conversor da fase 3 é o juiz final do modelo.
+
+Regra prática de revisão: **toda mudança responde qual aforismo autoriza a complexidade
+que ela introduz.** Sem resposta, a mudança não entra.
 
 ### Não-objetivos (fase 1)
 
@@ -253,7 +276,8 @@ horizontais incompletas.
 **Versionamento:** SemVer em 0.x durante o desenvolvimento. `1.0.0` marca a fase 1 completa
 e a promessa de que a API declarativa não muda sem deprecação.
 
-**Regra de ouro:** feature só está pronta quando a spec (este arquivo) foi atualizada junto.
+**Regra de ouro:** feature só está pronta quando a spec (este arquivo) foi atualizada junto —
+e o roadmap reflete o estado real do trabalho (11.4). Checkbox é registro, não intenção.
 
 ### M0 — Fundação (v0.0.x)
 
@@ -264,6 +288,8 @@ Infraestrutura mínima para desenvolver com prazer.
 - [x] Pacote `chen/` + `pyproject.toml` (Python ≥ 3.10) com extra `[dev]` + `ruff` + `pytest`
 - [x] Migrar o protótipo (`components.py`, `renderer.py`, `template_loader.py`)
       para `chen/model/` — o código atual vira a base, não é jogado fora
+- [ ] `.agent-playground/` prevista no `.gitignore` — seção 11.3
+      *(pendente: o `.gitignore` atual não a cobre; limpar o `demo.dot` da raiz ao aplicar)*
 
 **DoD:** `pip install -e .` e `pytest` verdes rodando localmente.
 
@@ -378,6 +404,41 @@ Regras que valem para todo milestone:
 - `pytest` é o único runner; testes não exigem `dot` instalado exceto os de `tests/layout/`,
   que pulam com marcador próprio quando o executável não existe (skips explícitos, nunca erros).
 
+### 11.3 Playground do agente — `.agent-playground/`
+
+Experimentos fazem parte do processo (testar o `dot`, inspecionar a saída `-Tjson`,
+prototipar uma regex, medir tamanhos de forma). Esses experimentos acontecem
+**exclusivamente** na pasta oculta `.agent-playground/`, na raiz do projeto — nunca
+esparramados pela árvore do repositório (o histórico `demo.dot` solto na raiz é o
+anti-exemplo).
+
+- **Experimentar ali é livre e encorajado**: sem precisar de teste, justificativa ou permissão.
+- Nada de dentro dela entra no git (`.gitignore`, item do M0) — mas nada dela é
+  importado pelo pacote ou referenciado por `tests/` tampouco.
+- **Regra de ouro: a pasta termina a tarefa vazia.** Agente que cria `demo.dot` ali,
+  apaga `demo.dot` quando o experimento conclui.
+- **Experimento que valeu algo vira teste**, com nome de comportamento (11.2) — nunca
+  arquivo solto na playground.
+- Conclusões descobertas por experimento vão para **esta spec** (ex.: detalhe do
+  `-Tjson` que só se descobre rodando), não para anotações na playground.
+
+### 11.4 Acompanhamento — a spec é o quadro de tarefas
+
+O agente trabalha **com o roadmap aberto** (seção 10) e o mantém vivo enquanto trabalha:
+
+- **Antes de começar** qualquer sessão ou tarefa: ler o diário de bordo (seção 13) e o
+  roadmap; identificar o milestone e o próximo item. Não se trabalha de memória.
+- **Durante:** cada item completado é marcado `[x]` **no momento em que é verificado** —
+  checkbox é registro do estado real, nunca intenção. Sem verificação feita (testes
+  verdes, DoD cumprido), sem `[x]`.
+- **Anotações:** descobertas, desvios e restrições encontrados no caminho viram anotação
+  na spec — na seção pertinente (como a nota pendente do M0) ou no diário de bordo
+  (seção 13). Nunca em arquivo externo, comentário de código ou memória da sessão.
+- **Desvio de design:** se o trabalho revela que a spec está errada, atualiza-se a spec
+  **antes** do código — o mesmo contrato de 11.2 vale para o roadmap.
+- **Fechamento de milestone:** marcar o DoD, registrar no diário de bordo (data, versão,
+  notas) e criar a tag correspondente, quando aplicável.
+
 ## 12. Convenções
 
 - Pacote: `chen` (repositório: `chen-diagram-lang`). Python ≥ 3.10.
@@ -385,3 +446,17 @@ Regras que valem para todo milestone:
   discussão/spec em português.
 - Testes: TDD com `pytest` — a **seção 11 é a autoridade**; nada aqui a sobrepõe.
 - Estilo: docstrings em todo público, type hints obrigatórios, `ruff` para lint/format.
+
+---
+
+## 13. Diário de bordo
+
+Registro vivo do trabalho, mantido pelo agente que executa (regra 11.4). Uma linha por
+evento significativo: item concluído, decisão tomada, desvio de rota. A primeira leitura
+de qualquer sessão é **seção 13 + seção 10**.
+
+| Data | Evento | Notas |
+|---|---|---|
+| 2026-10-26 | Spec v0.1 criada — decisões de API, layout, escopo, roadmap | — |
+| 2026-10-26 | Spec v0.2 — Zen como filosofia (seção 1), TDD + venv (seção 11), playground (11.3), acompanhamento (11.4) | — |
+| 2026-10-26 | M0 executado pelo agente implementador (git, venv, pacote `chen/`, migração do protótipo) | Pendente: `.agent-playground/` no `.gitignore` e limpeza do `demo.dot` da raiz |
