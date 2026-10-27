@@ -13,12 +13,12 @@ import shutil
 import pytest
 
 from chen import (
+    ISA,
     AssociativeRelationship,
     Attribute,
     Composite,
     Diagram,
     Entity,
-    ISA,
     Link,
     Owner,
     Relationship,
