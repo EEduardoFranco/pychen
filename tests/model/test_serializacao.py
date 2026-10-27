@@ -7,8 +7,8 @@ e remapeia tail/head. Round-trip é identidade.
 
 import pytest
 
-from chen.exceptions import ValidationError
-from chen.model import (
+from pychen.exceptions import ValidationError
+from pychen.model import (
     Attribute,
     Composite,
     Diagram,
@@ -216,7 +216,7 @@ class TestRoundtripCompleto:
         assert recarregado.name == "Vendas"
 
     def test_kind_isa_preserva_total_e_disjoint_no_roundtrip(self):
-        from chen.model import ISA
+        from pychen.model import ISA
 
         class Pessoa(Entity):
             cpf = Attribute(primary_key=True)
@@ -240,7 +240,7 @@ class TestRoundtripCompleto:
         assert supers[0]["label"] == "d" and supers[0]["total"] is True
 
     def test_kind_associativo_preserva_se_no_roundtrip(self):
-        from chen.model import AssociativeRelationship
+        from pychen.model import AssociativeRelationship
 
         class Cliente(Entity):
             cpf = Attribute(primary_key=True)
@@ -299,7 +299,7 @@ class TestNoKindDesconhecido:
     def test_node_kind_levanta_para_tipo_fora_do_modelo(self):
         from types import SimpleNamespace
 
-        from chen.model.serialize import node_kind
+        from pychen.model.serialize import node_kind
 
         estranho = SimpleNamespace(name="?")
 

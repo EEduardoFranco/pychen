@@ -9,7 +9,7 @@ from Graphviz, and the SVG is composed from fragments. Same input → same pixel
 byte for byte.
 
 ```python
-from chen import Diagram, Entity, WeakEntity, Relationship, Attribute, Composite, Link, Owner
+from pychen import Diagram, Entity, WeakEntity, Relationship, Attribute, Composite, Link, Owner
 
 class Cliente(Entity):
     cpf = Attribute(primary_key=True)

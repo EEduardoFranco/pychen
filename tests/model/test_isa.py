@@ -11,8 +11,8 @@ import warnings
 
 import pytest
 
-from chen.exceptions import ValidationError
-from chen.model import (
+from pychen.exceptions import ValidationError
+from pychen.model import (
     ISA,  # noqa: F401 — exposto pela API pública no caminho feliz
     Attribute,
     Diagram,
@@ -40,7 +40,7 @@ def _universidade():
 
 class TestDeclaracao:
     def test_descritor_cria_triângulo_com_uma_aresta_child_e_uma_super(self):
-        from chen.model import ISATriangle
+        from pychen.model import ISATriangle
 
         Pessoa, Aluno, Empregado = _universidade()
         diagrama = Diagram("U", elements=[Pessoa, Aluno, Empregado])
@@ -79,7 +79,7 @@ class TestDeclaracao:
         assert len(empsupers) == 1  # Empregado é total; Aluno não
 
     def test_triângulo_tem_exatamente_uma_child_e_uma_super(self):
-        from chen.model import ISATriangle
+        from pychen.model import ISATriangle
 
         Pessoa, Aluno, Empregado = _universidade()
         diagrama = Diagram("U", elements=[Pessoa, Aluno, Empregado])

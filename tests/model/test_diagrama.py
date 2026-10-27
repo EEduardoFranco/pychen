@@ -2,7 +2,7 @@
 ordem determinística e arestas do grafo.
 """
 
-from chen.model import Attribute, Diagram, Entity, Link, Relationship
+from pychen.model import Attribute, Diagram, Entity, Link, Relationship
 
 
 def _vendas_classes():

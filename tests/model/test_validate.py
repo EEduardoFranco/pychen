@@ -4,8 +4,8 @@
 
 import pytest
 
-from chen.exceptions import ValidationError
-from chen.model import (
+from pychen.exceptions import ValidationError
+from pychen.model import (
     Attribute,
     Composite,
     Diagram,
@@ -106,8 +106,8 @@ class TestE01AtributoDeclaradoNuncaAnexado:
     (serialização, fase 2). O teste materializa o estado pendente ao nível do modelo."""
 
     def test_atributo_sem_aresta_de_anexo_levanta_E01(self):
-        from chen.model.core import ATTRIBUTED_TO
-        from chen.model.validate import validate_diagram
+        from pychen.model.core import ATTRIBUTED_TO
+        from pychen.model.validate import validate_diagram
 
         class Cliente(Entity):
             cpf = Attribute(primary_key=True)

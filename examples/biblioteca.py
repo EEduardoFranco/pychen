@@ -2,7 +2,7 @@
 
 from pathlib import Path
 
-from chen import Attribute, Diagram, Entity, Link, Owner, Relationship, WeakEntity
+from pychen import Attribute, Diagram, Entity, Link, Owner, Relationship, WeakEntity
 
 
 class Aluno(Entity):

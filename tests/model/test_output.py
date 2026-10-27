@@ -1,6 +1,6 @@
 """API pública de saída (spec §4): `Diagram.to_svg()` e `Diagram.save(path)`."""
 
-from chen.model import Attribute, Diagram, Entity, Link, Relationship
+from pychen.model import Attribute, Diagram, Entity, Link, Relationship
 
 
 def _vendas_diagrama():

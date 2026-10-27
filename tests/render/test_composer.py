@@ -9,7 +9,7 @@ import shutil
 
 import pytest
 
-from chen.model import (
+from pychen.model import (
     Attribute,
     Composite,
     Diagram,
@@ -19,7 +19,7 @@ from chen.model import (
     Relationship,
     WeakEntity,
 )
-from chen.render.composer import render_svg
+from pychen.render.composer import render_svg
 
 pytestmark = [
     pytest.mark.requires_dot,
@@ -195,7 +195,7 @@ class TestNotacaoFase2:
     """Fase 2 (§2/§10): entidade associativa — losango dentro de retângulo."""
 
     def test_associativa_tem_retangulo_e_losango_interno(self):
-        from chen.model import AssociativeRelationship
+        from pychen.model import AssociativeRelationship
 
         class Cliente(Entity):
             cpf = Attribute(primary_key=True)
@@ -214,7 +214,7 @@ class TestNotacaoFase2:
         assert '<g class="associative">' in svg and "<polygon" in svg
 
     def test_isa_tem_triangulo_e_linha_dupla_para_superclasse_total(self):
-        from chen.model import ISA
+        from pychen.model import ISA
 
         class Pessoa(Entity):
             cpf = Attribute(primary_key=True)

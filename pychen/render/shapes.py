@@ -20,7 +20,7 @@ INSET = 3.0
 # losango interno da entidade associativa: 60% da geom do nó (§8)
 ASSOCIATIVE_DIAMOND_RATIO = 0.6
 if TYPE_CHECKING:
-    from chen.layout.dot import EdgeGeom, NodeGeom
+    from pychen.layout.dot import EdgeGeom, NodeGeom
 
 
 def _num(value: float) -> str:

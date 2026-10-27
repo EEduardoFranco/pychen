@@ -1,6 +1,6 @@
 """test_template_loader — carregamento de fragmentos SVG (spec §8) e escape de texto."""
 
-from chen.render.template_loader import TEMPLATES_DIR, Template
+from pychen.render.template_loader import TEMPLATES_DIR, Template
 
 
 class TestCarregamento:

@@ -12,7 +12,7 @@ import shutil
 
 import pytest
 
-from chen import (
+from pychen import (
     ISA,
     AssociativeRelationship,
     Attribute,

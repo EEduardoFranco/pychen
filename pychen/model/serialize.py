@@ -12,8 +12,8 @@ Chaves omissas são defaults: `flags` só entra quando algum flag é true;
 
 from __future__ import annotations
 
-from chen.model.attributes import Attribute, CompositeNode
-from chen.model.core import (
+from pychen.model.attributes import Attribute, CompositeNode
+from pychen.model.core import (
     ATTRIBUTED_TO,
     ISA_CHILD,
     ISA_SUPER,
@@ -23,10 +23,10 @@ from chen.model.core import (
     Edge,
     Identifier,
 )
-from chen.model.entities import Entity, WeakEntity
-from chen.model.isa import ISATriangle
-from chen.model.relationships import AssociativeRelationship, Relationship
-from chen.model.validate import validate_diagram
+from pychen.model.entities import Entity, WeakEntity
+from pychen.model.isa import ISATriangle
+from pychen.model.relationships import AssociativeRelationship, Relationship
+from pychen.model.validate import validate_diagram
 
 FORMAT_VERSION = 1
 _FLAGS = ("primary_key", "multivalued", "derived", "partial_key")

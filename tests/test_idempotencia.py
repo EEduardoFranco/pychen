@@ -8,7 +8,7 @@ import shutil
 
 import pytest
 
-from chen import Attribute, Composite, Diagram, Entity, Link, Owner, Relationship, WeakEntity
+from pychen import Attribute, Composite, Diagram, Entity, Link, Owner, Relationship, WeakEntity
 
 pytestmark = [
     pytest.mark.requires_dot,

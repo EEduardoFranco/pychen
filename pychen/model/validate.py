@@ -14,17 +14,17 @@ from __future__ import annotations
 import warnings
 from typing import TYPE_CHECKING
 
-from chen.exceptions import ValidationError
-from chen.model.attributes import Attribute, CompositeNode
-from chen.model.entities import Entity, WeakEntity
-from chen.model.isa import ISATriangle
+from pychen.exceptions import ValidationError
+from pychen.model.attributes import Attribute, CompositeNode
+from pychen.model.entities import Entity, WeakEntity
+from pychen.model.isa import ISATriangle
 
 if TYPE_CHECKING:
-    from chen.model.core import Diagram
+    from pychen.model.core import Diagram
 
 
 def validate_diagram(diagram: Diagram) -> None:
-    from chen.model.core import (  # isolated import: core importa este módulo
+    from pychen.model.core import (  # isolated import: core importa este módulo
         ATTRIBUTED_TO,
         ISA_CHILD,
         LINK,

@@ -15,11 +15,11 @@ from __future__ import annotations
 
 from dataclasses import dataclass
 
-from chen.exceptions import ValidationError
-from chen.model.attributes import Composite
-from chen.model.entities import Entity, WeakEntity
-from chen.model.relationships import AssociativeRelationship, Owner, Relationship
-from chen.model.validate import validate_diagram
+from pychen.exceptions import ValidationError
+from pychen.model.attributes import Composite
+from pychen.model.entities import Entity, WeakEntity
+from pychen.model.relationships import AssociativeRelationship, Owner, Relationship
+from pychen.model.validate import validate_diagram
 
 ATTRIBUTED_TO = "attributed_to"
 LINK = "link"
@@ -107,7 +107,7 @@ class Diagram:
             self._new_link_edge(relationship, target_instance, link)
 
     def _build_isas(self, entity_class: type, sub, instances: dict) -> list[tuple]:
-        from chen.model.isa import ISATriangle  # isolated import: evitar ciclo
+        from pychen.model.isa import ISATriangle  # isolated import: evitar ciclo
 
         pendentes = []
         for isa_descriptor in entity_class.__chen_isas__:
@@ -234,20 +234,20 @@ class Diagram:
 
     def to_json(self) -> dict:
         """Serialização canônica do modelo (spec §9). Módulo lazy: core é o grafo puro."""
-        from chen.model.serialize import to_json as dump  # isolated import
+        from pychen.model.serialize import to_json as dump  # isolated import
 
         return dump(self)
 
     @classmethod
     def from_json(cls, data: dict) -> Diagram:
         """Reconstrói e revalida um diagrama do dump canônico (spec §9)."""
-        from chen.model.serialize import from_json as load  # isolated import
+        from pychen.model.serialize import from_json as load  # isolated import
 
         return load(data)
 
     def to_svg(self) -> str:
         """Renderiza o diagrama (spec §4). Render importa lazy: camada acima do model."""
-        from chen.render.composer import render_svg  # isolated import
+        from pychen.render.composer import render_svg  # isolated import
 
         return render_svg(self)
 

@@ -10,8 +10,8 @@ de arestas pendentes (§5, invariante de backtracking).
 
 import pytest
 
-from chen.exceptions import ValidationError
-from chen.model import (
+from pychen.exceptions import ValidationError
+from pychen.model import (
     AssociativeRelationship,
     Attribute,
     Diagram,

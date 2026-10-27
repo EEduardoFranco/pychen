@@ -6,8 +6,8 @@ Regras:
 - losango → polígono; aresta → path; label → fragmento próprio.
 """
 
-from chen.layout.dot import EdgeGeom, NodeGeom
-from chen.render.shapes import attribute, edge, entity, relationship, weak_entity
+from pychen.layout.dot import EdgeGeom, NodeGeom
+from pychen.render.shapes import attribute, edge, entity, relationship, weak_entity
 
 
 class TestEntity:

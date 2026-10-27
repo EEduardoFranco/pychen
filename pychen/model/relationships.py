@@ -11,9 +11,9 @@ Relacionamentos também podem declarar atributos (§2: atributo ligado ao losang
 
 from __future__ import annotations
 
-from chen.exceptions import ValidationError
-from chen.model.attributes import Attribute
-from chen.model.entities import display_name
+from pychen.exceptions import ValidationError
+from pychen.model.attributes import Attribute
+from pychen.model.entities import display_name
 
 VALID_CARDINALITIES = {"1", "N", "M"}
 

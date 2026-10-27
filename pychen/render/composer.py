@@ -6,12 +6,12 @@ na ordem existente no modelo. Números com duas casas; texto escapado no loader.
 
 from __future__ import annotations
 
-from chen.layout.dot import compute_layout
-from chen.model.attributes import Attribute, CompositeNode
-from chen.model.entities import WeakEntity
-from chen.model.isa import ISATriangle
-from chen.model.relationships import AssociativeRelationship, Relationship
-from chen.render.shapes import (
+from pychen.layout.dot import compute_layout
+from pychen.model.attributes import Attribute, CompositeNode
+from pychen.model.entities import WeakEntity
+from pychen.model.isa import ISATriangle
+from pychen.model.relationships import AssociativeRelationship, Relationship
+from pychen.render.shapes import (
     associative,
     attribute,
     edge,
@@ -20,7 +20,7 @@ from chen.render.shapes import (
     relationship,
     weak_entity,
 )
-from chen.render.template_loader import Template
+from pychen.render.template_loader import Template
 
 
 def render_svg(diagram) -> str:

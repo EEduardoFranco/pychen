@@ -7,8 +7,8 @@
 
 import pytest
 
-from chen import Attribute, Diagram, Entity, Owner, WeakEntity
-from chen.exceptions import ValidationError
+from pychen import Attribute, Diagram, Entity, Owner, WeakEntity
+from pychen.exceptions import ValidationError
 
 
 def _pedido_com_chave():

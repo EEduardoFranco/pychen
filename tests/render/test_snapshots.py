@@ -5,8 +5,8 @@ revisando-se o arquivo `.ambr`. Aqui não há layout: os testes cobrem shapes +
 templates puros (não exigem `dot`).
 """
 
-from chen.layout.dot import EdgeGeom, NodeGeom
-from chen.render.shapes import (
+from pychen.layout.dot import EdgeGeom, NodeGeom
+from pychen.render.shapes import (
     associative,
     attribute,
     edge,
@@ -15,7 +15,7 @@ from chen.render.shapes import (
     relationship,
     weak_entity,
 )
-from chen.render.template_loader import Template
+from pychen.render.template_loader import Template
 
 
 def _render(fragment, parameters) -> str:

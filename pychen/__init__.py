@@ -1,6 +1,6 @@
 """API pública declarativa (spec §4). Exemplo canônico: ver SPECS.md §4."""
 
-from chen.model import (
+from pychen.model import (
     ISA,
     AssociativeRelationship,
     Attribute,

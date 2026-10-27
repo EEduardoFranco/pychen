@@ -9,8 +9,8 @@ Regras testadas aqui:
 
 import pytest
 
-from chen.exceptions import ValidationError
-from chen.model import Attribute, Entity, Link, Relationship
+from pychen.exceptions import ValidationError
+from pychen.model import Attribute, Entity, Link, Relationship
 
 
 class TestColetaDeAtributos:

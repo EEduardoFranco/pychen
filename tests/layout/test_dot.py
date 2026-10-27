@@ -10,8 +10,8 @@ import shutil
 
 import pytest
 
-from chen.layout.dot import DotNotFound, compute_layout, to_dot
-from chen.model import Attribute, Diagram, Entity, Link, Relationship
+from pychen.layout.dot import DotNotFound, compute_layout, to_dot
+from pychen.model import Attribute, Diagram, Entity, Link, Relationship
 
 pytestmark = [
     pytest.mark.requires_dot,
@@ -80,7 +80,7 @@ class TestComputeLayout:
         import json
         import subprocess
 
-        from chen.layout.dot import _resolve_dot, to_dot
+        from pychen.layout.dot import _resolve_dot, to_dot
 
         diagrama = _vendas_diagrama()
         raw = subprocess.run(
@@ -150,7 +150,7 @@ class TestParticipacaoTotal:
 
 class TestDotNaoEncontrado:
     def test_dot_ausente_levanta_DotNotFound(self, monkeypatch):
-        from chen.layout import dot
+        from pychen.layout import dot
 
         monkeypatch.setattr(dot, "_resolve_dot", lambda: None)
 

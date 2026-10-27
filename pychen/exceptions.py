@@ -2,7 +2,7 @@
 
 
 class ChenError(Exception):
-    """Base de todos os erros do chen-diagram-lang."""
+    """Base de todos os erros do pychen."""
 
 
 class ValidationError(ChenError):

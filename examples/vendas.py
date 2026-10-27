@@ -2,7 +2,7 @@
 
 from pathlib import Path
 
-from chen import Attribute, Composite, Diagram, Entity, Link, Owner, Relationship, WeakEntity
+from pychen import Attribute, Composite, Diagram, Entity, Link, Owner, Relationship, WeakEntity
 
 
 class Cliente(Entity):

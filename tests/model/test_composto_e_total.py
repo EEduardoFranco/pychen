@@ -5,7 +5,7 @@ não à entidade — a aresta mãeentidade→composto→filhas.
  Participação total (Link(total=True)) também é exercida aqui (spec §2).
 """
 
-from chen import Attribute, Composite, Diagram, Entity, Link, Relationship
+from pychen import Attribute, Composite, Diagram, Entity, Link, Relationship
 
 
 def _vendas_com_composto():

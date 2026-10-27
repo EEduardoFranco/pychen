@@ -4,7 +4,7 @@ A variante (§8) é escolhida por prioridade — o atributo é desenhado de um j
 partial_key > primary_key > multivalued > derived > simple.
 """
 
-from chen.model.attributes import Attribute
+from pychen.model.attributes import Attribute
 
 
 class TestFlags:

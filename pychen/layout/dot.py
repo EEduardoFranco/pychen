@@ -19,11 +19,11 @@ import subprocess
 from dataclasses import dataclass
 from typing import TYPE_CHECKING
 
-from chen.exceptions import DotNotFound
+from pychen.exceptions import DotNotFound
 
 if TYPE_CHECKING:
-    from chen.layout.dot import Layout
-    from chen.model.core import Diagram, Edge
+    from pychen.layout.dot import Layout
+    from pychen.model.core import Diagram, Edge
 
 
 @dataclass(frozen=True)

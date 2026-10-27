@@ -12,7 +12,7 @@ menos uma chave parcial (`partial_key=True`).
 
 from __future__ import annotations
 
-from chen.model.attributes import Attribute, Composite
+from pychen.model.attributes import Attribute, Composite
 
 
 class Entity:
@@ -21,7 +21,7 @@ class Entity:
         cls.__chen_attributes__ = [
             value for value in vars(cls).values() if isinstance(value, (Attribute, Composite))
         ]
-        from chen.model.isa import ISA  # isolated import: evitar ciclo (isa não importa daqui)
+        from pychen.model.isa import ISA  # isolated import: evitar ciclo (isa não importa daqui)
 
         cls.__chen_isas__ = [value for value in vars(cls).values() if isinstance(value, ISA)]
 
@@ -40,6 +40,6 @@ def display_name(cls: type) -> str:
 class WeakEntity(Entity):
     def __init_subclass__(cls, **kwargs: object) -> None:
         super().__init_subclass__(**kwargs)  # coleta os atributos como Entity
-        from chen.model.relationships import Owner  # isolated import: evitar ciclo
+        from pychen.model.relationships import Owner  # isolated import: evitar ciclo
 
         cls.__chen_owners__ = [value for value in vars(cls).values() if isinstance(value, Owner)]
