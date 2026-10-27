@@ -9,11 +9,6 @@ from chen.model.relationships import Relationship
 
 
 def validate_diagram(diagram) -> None:
-    from chen.model.core import Diagram  # isolated import: typing support only
-
-    if not isinstance(diagram, Diagram):
-        raise TypeError("validate_diagram expects a Diagram instance")
-
     for node in diagram.nodes:
         if not isinstance(node, Relationship):
             continue
