@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "chen-diagram-lang"
-version = "0.2.0"
+version = "1.0.0"
 description = "DSL em Python para diagramas conceituais de banco de dados (notação de Chen) com renderização SVG."
 requires-python = ">=3.10"
 dependencies = []

@@ -3,7 +3,7 @@
 > A "bíblia" do projeto. Toda decisão de design passa por aqui: se não está na spec,
 > ou entra na spec, ou não entra no código.
 
-Status: v0.4 · Última atualização: 2026-10-27
+Status: v0.5 · Última atualização: 2026-10-27 · **fase 1 fechada (v1.0.0)**
 
 ---
 
@@ -219,8 +219,14 @@ Validação roda **antes** do layout. Diagrama inválido nunca gera SVG.
 Nota (E04, registada em 2026-10-27): a tabela original dizia "entidade fraca com mais de um dono";
 a implementação do M2 estendeu a regra para as três violações do invariante "exatamente
 um dono" (§5) — zero donos e `Owner` em entidade forte são o mesmo erro de contagem.
-Estado atual: E05/E06 chegaram no M1; E03/E04/E08 no M2 (o teste de E08 cobre Link **e**
-Owner). E01, E02 e E07 são do M3.
+Estado atual (2026-10-27, M3): **E01–E08 todas implementadas e testadas.** E05/E06 no
+M1; E03/E04/E08 no M2 (o teste de E08 cobre Link **e** Owner); E01/E02/E07 no M3.
+Duas notas de interpretação:
+- **E01** é impossível por construção na DSL declarativa (todo descritor coletado é
+  anexado); a validação vive no **modelo puro** e protege consumidores de estado —
+  inclusive a serialização da fase 2.
+- **E07** vale para nomes de **entidades e relacionamentos**; nomes de atributos são
+  locais (filhos de compostos repetem-se por natureza).
 
 ---
 
@@ -368,15 +374,24 @@ revisado nas duas formas (estrutural e visual no preview); 99+ testes verdes.
 
 **DoD:** o exemplo canônico da seção 4, completo, renderiza conforme a seção 2.
 
-### M3 — Robustez e DX (v0.3.0) → fecha a fase 1
+### M3 — Robustez e DX (v0.3.0 → fecha a fase 1)
 
-- [ ] Validações E01–E08 completas, com mensagens apontando o elemento culpado
-- [ ] Erro claro quando `dot` não estiver no PATH (instrução de instalação)
-- [ ] Teste de idempotência: mesmo modelo sempre → mesmo SVG
-- [ ] README com quickstart; exemplos em `examples/`
+- [x] Validações E01–E08 completas, com mensagens apontando o elemento culpado —
+      tabela completa testada: E01 (invariante do modelo puro, §6), E02 (warning),
+      E05–E08 (M1/M2)
+- [x] Erro claro quando `dot` não estiver no PATH (instrução de instalação) —
+      `DotNotFound` com a URL graphviz.org/download, asserção no teste
+- [x] Teste de idempotência: mesmo modelo sempre → mesmo SVG (`tests/test_idempotencia.py`
+      — 4 diagramas independentes, bytes iguais)
+- [x] README com quickstart; exemplos em `examples/` (`vendas.py` canônico do §4,
+      `biblioteca.py`, ambos executáveis e verificando a saída)
 - [ ] Publicar no PyPI (opcional, decide na hora)
+      → **decidido em 2026-10-27: ainda não publicar** (registro em §13); item fica
+      aberto até nova decisão do usuário — não trava a tag `1.0.0`
 
-**DoD:** fase 1 fechada; tag `1.0.0`.
+**DoD:** ✅ fase 1 fechada em 2026-10-27 (110 testes verdes, cobertura 100%, ruff limpo);
+tag `1.0.0`. A promessa da §10 vale a partir da tag: a API declarativa não muda sem
+deprecação.
 
 ### Fase 2 — Chen completo (0.4.x)
 
@@ -519,6 +534,9 @@ de qualquer sessão é **seção 13 + seção 10**.
 | 2026-10-27 | M2 ✅ DoD verificado — golden v2 (exemplo canônico completo do §4) gerado e revisado; v0.2.0 | M2 fechado |
 | 2026-10-27 | M3 iniciado (fase que fecha a fase 1). Decisões do usuário: **não publicar no PyPI ainda**; push futuro no GitHub sob o perfil **EEduardoFranco** (email `dudufranco25@gmail.com`) — identidade git do repo já apontada; a macro `HANDOFF` continua desativada (estado mora aqui) | — |
 | 2026-10-27 | TDD camada model: E01 (invariante do modelo), E02 (warning), E07 (nomes de topo) | — |
+| 2026-10-27 | M3 model/robustez ✅ — E01/E02/E07 + idempotência (4 diagramas independentes → bytes iguais) + assert da instrução de instalação no `DotNotFound`; 110 testes, cobertura 100% | — |
+| 2026-10-27 | M3 DX ✅ — README (inglês, §12) com quickstart + `examples/{vendas,biblioteca}.py` executáveis e revisados; **nota:** install editável estava stale (finder da 0.0.1 não resolvia `chen` fora da raiz) — re `pip install -e ".[dev]"` resolveu; a sanidade da §11.1 (dois comandos, do zero) continua valendo | — |
+| 2026-10-27 | **Fase 1 fechada** — v1.0.0, tag `1.0.0`; promessa: API declarativa não muda sem deprecação. PyPI: **não publicar** (decisão do usuário); push no GitHub (perfil `EEduardoFranco`) será feito por agente designado — o repo ainda não tem remoto | fase 1 ✅ |
 | 2026-10-26 | HANDOFF.md removido (conteúdo incorporado ao trabalho); item pendente do M0 fechado; `SPECS.md` v0.2 commitado | M0 ✅ |
 | 2026-10-26 | M1 iniciado — TDD camada model: testes Red em `tests/model/` | — |
 | 2026-10-26 | M1 model ✅ — `__init_subclass__` + `__set_name__` (não metaclass explícita; decisão do handoff confirmada no código), ids por diagrama (nós e arestas dividem a sequência), E05/E06/E08 | commit `741c098` |
