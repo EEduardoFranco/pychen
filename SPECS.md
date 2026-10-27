@@ -405,8 +405,11 @@ Infraestrutura mínima para desenvolver com prazer.
       para `chen/model/` — o código atual vira a base, não é jogado fora
 - [x] `.agent-playground/` prevista no `.gitignore` — seção 11.3
       *(fechado na sessão de 2026-10-26: entrada adicionada ao `.gitignore` e `demo.dot` apagado da raiz)*
-- [ ] Renomear pacote `chen/` → `pychen/` e alinhar `pyproject.toml` (nome do projeto: `pychen`)
+- [x] Renomear pacote `chen/` → `pychen/` e alinhar `pyproject.toml` (nome do projeto: `pychen`)
       — decisão de nome de 2026-10-27; atualizar imports, `tests/` e refazer o install editável
+      *(fechado em 2026-10-27: `git mv` + 29 arquivos de imports/tests/examples/README +
+      `name`/`include` no pyproject + reinstall editável → `pychen 1.0.0`; 147 testes verdes,
+      17 snapshots, `ruff check` limpa — ver §13)*
 
 **DoD:** `pip install -e .` e `pytest` verdes rodando localmente.
 
@@ -609,6 +612,7 @@ de qualquer sessão é **seção 13 + seção 10**.
 | 2026-10-26 | Spec v0.2 — Zen como filosofia (seção 1), TDD + venv (seção 11), playground (11.3), acompanhamento (11.4) | — |
 | 2026-10-26 | M0 executado pelo agente implementador (git, venv, pacote `chen/`, migração do protótipo) | Pendente: `.agent-playground/` no `.gitignore` e limpeza do `demo.dot` da raiz |
 | 2026-10-27 | Nome oficial do projeto: **pychen** — spec atualizada (visão, arquitetura, imports, CLI, convenções, descrição pública de 233 car.) | Pendente: renomear pacote `chen/` → `pychen/` (item do M0) |
+| 2026-10-27 | **Rename executado** — `git mv chen/ pychen/` (histórico preservado, 16 arquivos `R`) + import trocado em 29 `.py` (pacote, tests/, examples/) + README + `pyproject.toml` (`name = "pychen"`, `include = ["pychen*"]`) + docstring de `exceptions.py`; egg_info antigo removido e reinstall editável → `pychen 1.0.0`. Verificação: 147 testes verdes (dot no PATH, zero skips indesejados), 17 snapshots passed, `ruff check .` limpa; `ruff format --check` aponta apenas README/SPECS.md (blocos de exemplo com comentários alinhados — intencional, pré-existente). Única sobra do nome antigo em código: nenhuma (`git grep "\bchen\b"` vazio em `*.py`); o nome continua só no histórico do git (intencional) | M0 rename ✅ |
 | 2026-10-26 | Tag `v0.1.0` criada no fechamento do M1 | — |
 | 2026-10-26 | M2 iniciado — TDD camada model: flags de atributo, `WeakEntity`/`Owner` (E03/E04), `Composite`, participação total e atributos de relacionamento | — |
 | 2026-10-27 | M2 model ✅ — flags não-padrão de `Attribute` + `variant` por prioridade (`partial_key > key > multivalued > derived > simple`), `WeakEntity`/`Owner`, `Composite`/`CompositeNode`, `Link(total)`, atributos de relacionamento; **bug apanado por TDD:** links saíam com `tail` no último nó porque `_build_links` lia `self.nodes[-1]` após copiar atributos do relacionamento | — |
