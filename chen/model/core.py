@@ -101,3 +101,17 @@ class Diagram:
                     label=link.cardinality,
                 )
             )
+
+    def to_svg(self) -> str:
+        """Renderiza o diagrama (spec §4). Render importa lazy: camada acima do model."""
+        from chen.render.composer import render_svg  # isolated import
+
+        return render_svg(self)
+
+    def save(self, path: str) -> str:
+        """Escreve o SVG em disco e devolve o conteúdo gravado."""
+        import pathlib
+
+        svg = self.to_svg()
+        pathlib.Path(path).write_text(svg, encoding="utf-8")
+        return svg

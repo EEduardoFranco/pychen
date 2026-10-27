@@ -1,0 +1,37 @@
+"""Golden test v1 (spec §10, M1): versão reduzida do exemplo canônico §4.
+
+Cliente(cpf, nome) + Pedido(numero) + Faz(1, N) → SVG determinístico.
+O snapshot é o registro revisado do SVG aceito; atualização só com
+`--snapshot-update` e revisada no diff.
+
+Este teste é de ponta a ponta e exige `dot` (anotação da §11.2), com skip
+explícito quando o executável não está no PATH.
+"""
+
+import shutil
+
+import pytest
+
+from chen import Attribute, Diagram, Entity, Link, Relationship
+
+pytestmark = [
+    pytest.mark.requires_dot,
+    pytest.mark.skipif(shutil.which("dot") is None, reason="graphviz `dot` not found in PATH"),
+]
+
+
+def test_golden_v1_reduzido_do_exemplo_canonico(snapshot):
+    class Cliente(Entity):
+        cpf = Attribute(primary_key=True)
+        nome = Attribute()
+
+    class Pedido(Entity):
+        numero = Attribute(primary_key=True)
+
+    class Faz(Relationship):
+        cliente = Link(Cliente, "1")
+        pedido = Link(Pedido, "N")
+
+    diagrama = Diagram("Vendas", elements=[Cliente, Pedido, Faz])
+
+    assert diagrama.to_svg() == snapshot
