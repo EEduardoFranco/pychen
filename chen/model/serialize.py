@@ -22,7 +22,7 @@ from chen.model.core import (
     Identifier,
 )
 from chen.model.entities import Entity, WeakEntity
-from chen.model.relationships import Relationship
+from chen.model.relationships import AssociativeRelationship, Relationship
 from chen.model.validate import validate_diagram
 
 FORMAT_VERSION = 1
@@ -65,6 +65,8 @@ def _node_to_json(node, obj_id: int) -> dict:
 def node_kind(node) -> str:
     if isinstance(node, WeakEntity):
         return "weak_entity"
+    if isinstance(node, AssociativeRelationship):
+        return "associative"
     if isinstance(node, Entity):
         return "entity"
     if isinstance(node, Relationship):
@@ -131,6 +133,10 @@ def _node_from(raw: dict):
         return node
     if kind == "relationship":
         node = Relationship()
+        node.name = name
+        return node
+    if kind == "associative":
+        node = AssociativeRelationship()
         node.name = name
         return node
     if kind == "attribute":

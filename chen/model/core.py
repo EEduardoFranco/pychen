@@ -18,7 +18,7 @@ from dataclasses import dataclass
 from chen.exceptions import ValidationError
 from chen.model.attributes import Composite
 from chen.model.entities import Entity, WeakEntity
-from chen.model.relationships import Owner, Relationship
+from chen.model.relationships import AssociativeRelationship, Owner, Relationship
 from chen.model.validate import validate_diagram
 
 ATTRIBUTED_TO = "attributed_to"
@@ -69,7 +69,7 @@ class Diagram:
         entity_classes = [e for e in self.elements if issubclass(e, Entity)]
         relationship_classes = [e for e in self.elements if issubclass(e, Relationship)]
 
-        instances: dict[type, Entity] = {}
+        instances: dict[type, Entity | Relationship] = {}
         for entity_class in entity_classes:
             self._check_no_owner_on_strong(entity_class)
             instance = entity_class()
@@ -79,11 +79,21 @@ class Diagram:
             if issubclass(entity_class, WeakEntity):
                 self._build_owners(entity_class, instance, instances)
 
+        pendentes: list[tuple] = []
         for relationship_class in relationship_classes:
             instance = relationship_class()
+            instances[relationship_class] = instance  # associativa pode ser alvo de Link
             self._new_node(instance)
             self._copy_attributes(relationship_class, instance)
-            self._build_links(relationship_class, instance, instances)
+            pendentes.extend(self._build_links(relationship_class, instance, instances))
+
+        # passe de arestas pendentes (§5): alvo declarado depois na lista resolve
+        # aqui; a ordem de ids dos diagramas sem associação fica inalterada
+        for link, relationship in pendentes:
+            target_instance = instances.get(link.target)
+            if target_instance is None:
+                raise self._e08(link.target)
+            self._new_link_edge(relationship, target_instance, link)
 
     def _check_no_owner_on_strong(self, entity_class: type) -> None:
         if issubclass(entity_class, WeakEntity):
@@ -93,6 +103,38 @@ class Diagram:
                 "E04",
                 f'"{entity_class.__name__}" is a strong entity and cannot declare Owner',
             )
+
+    def _build_links(self, relationship_class: type, relationship, instances: dict) -> list[tuple]:
+        pendentes = []
+        for link in relationship_class.__chen_links__:
+            target_instance = self._resolve_target(link, instances)
+            if target_instance is None:
+                pendentes.append((link, relationship))
+                continue
+            self._new_link_edge(relationship, target_instance, link)
+        return pendentes
+
+    @staticmethod
+    def _resolve_target(link, instances: dict) -> Entity | Relationship | None:
+        target_class = link.target
+        if not issubclass(target_class, Entity | AssociativeRelationship):
+            raise ValidationError(
+                "E08",
+                f'Link target "{target_class.__name__}" is not an Entity or '
+                "AssociativeRelationship and cannot be a Link target",
+            )
+        return instances.get(target_class)
+
+    def _new_link_edge(self, relationship, target_instance, link) -> None:
+        self._new_edge(
+            Edge(
+                tail=relationship.obj_id,
+                head=target_instance.obj_id,
+                kind=LINK,
+                label=link.cardinality,
+                total=link.total,
+            )
+        )
 
     def _build_owners(self, entity_class: type, weak, instances: dict[type, Entity]) -> None:
         for owner_descriptor in entity_class.__chen_owners__:
@@ -129,23 +171,6 @@ class Diagram:
             self._new_node(attribute)
             composite.attributes.append(attribute)
             self._new_edge(Edge(tail=attribute.obj_id, head=composite.obj_id, kind=ATTRIBUTED_TO))
-
-    def _build_links(
-        self, relationship_class: type, relationship, instances: dict[type, Entity]
-    ) -> None:
-        for link in relationship_class.__chen_links__:
-            entity = instances.get(link.target)
-            if entity is None:
-                raise self._e08(link.target)
-            self._new_edge(
-                Edge(
-                    tail=relationship.obj_id,
-                    head=entity.obj_id,
-                    kind=LINK,
-                    label=link.cardinality,
-                    total=link.total,
-                )
-            )
 
     @staticmethod
     def _e08(target: type) -> ValidationError:

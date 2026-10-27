@@ -56,3 +56,13 @@ class Relationship:
         self.name: str = display_name(type(self))
         self.obj_id: int = 0
         self.attributes: list[Attribute] = []
+
+
+class AssociativeRelationship(Relationship):
+    """Entidade associativa (spec §2/§5, fase 2): losango dentro de retângulo.
+
+    Relacionamento que participa de outros relacionamentos: coleciona `Link`s
+    como qualquer `Relationship`, pode declarar atributos e pode ser **alvo** de
+    `Link` de outros relacionamentos. Subclasse dedicada — decisão registrada
+    em §13 (2026-10-27): explícita no olhar, sem mágica de Meta.
+    """

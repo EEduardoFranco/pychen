@@ -215,6 +215,32 @@ class TestRoundtripCompleto:
 
         assert recarregado.name == "Vendas"
 
+    def test_kind_associativo_preserva_se_no_roundtrip(self):
+        from chen.model import AssociativeRelationship
+
+        class Cliente(Entity):
+            cpf = Attribute(primary_key=True)
+
+        class Produto(Entity):
+            codigo = Attribute(primary_key=True)
+
+        class VendaProduto(AssociativeRelationship):
+            cliente = Link(Cliente, "1")
+            produto = Link(Produto, "N")
+            quantidade = Attribute()
+
+        class Faturada(Relationship):
+            venda = Link(VendaProduto, "N")
+            nota = Link(Cliente, "1")
+
+        original = Diagram("Vendas", elements=[Cliente, Produto, VendaProduto, Faturada])
+
+        recarregado = Diagram.from_json(original.to_json())
+
+        assert recarregado.to_json() == original.to_json()
+        kinds = [node["kind"] for node in recarregado.to_json()["nodes"]]
+        assert kinds.count("associative") == 1
+
 
 class TestFormatoInvalido:
     """Malformação de payload é ValueError (não é regra E* — é formato)."""

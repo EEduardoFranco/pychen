@@ -76,7 +76,7 @@ que ela introduz.** Sem resposta, a mudança não entra.
 | Participação parcial/total | linha simples / linha dupla | ✅ |
 | Atributo de relacionamento | elipse ligada ao losango | ✅ |
 | ISA | triângulo | ❌ fase 2 |
-| Entidade associativa | losango dentro de retângulo | ❌ fase 2 |
+| Entidade associativa | losango dentro de retângulo | 🔨 fase 2 |
 
 Cardinalidades válidas: `"1"`, `"N"`, `"M"` (validadas; qualquer outra coisa é erro).
 
@@ -182,6 +182,11 @@ Nós do grafo:
 - `WeakEntity(owner, partial_key, attributes)` — exatamente **um** dono; a aresta
   dono→fraca é total e de cardinalidade `(1,1)`; exige ao menos um `partial_key`.
 - `Relationship(name, links, attributes)` — ≥ 2 `Link`s.
+- `AssociativeRelationship(name, links, attributes)` — **entidade associativa**
+  (fase 2): relacionamento que participa de outros relacionamentos, renderizado
+  como losango dentro de retângulo. Declarada como subclasse dedicada de
+  `Relationship` (decisão de 2026-10-27, registrada em §13); pode ser **alvo de
+  `Link`** de outros relacionamentos.
 - `Attribute(name, flags)` — flags: `primary_key`, `multivalued`, `derived`, `partial_key`.
 - `Composite(name, attributes)` — nó que agrega sub-atributos; renderiza como elipse
   mãe + elipses filhas ligadas.
@@ -195,9 +200,12 @@ Arestas do grafo:
 
 Invariantes (garantidos pelo construtor/metaclass, não pelo renderizador):
 
-- Aresta `link` só conecta `Relationship` a `Entity`.
+- Aresta `link` só conecta `Relationship` a (`Entity` | `AssociativeRelationship`).
 - Cardinalidade ∈ {"1", "N", "M"}.
 - `WeakEntity` tem `owner`; `Entity` não pode ter `owner`.
+- Backtracking de alvos (fase 2): um `Link` para entidade associativa declarada
+  **depois** na lista `elements` resolve num passe de arestas pendentes no fim do
+  build — a ordem dos ids dos diagramas sem associação fica inalterada.
 
 ---
 
@@ -212,7 +220,7 @@ Invariantes (garantidos pelo construtor/metaclass, não pelo renderizador):
 | E05 | Relacionamento com menos de 2 entidades | erro |
 | E06 | Cardinalidade inválida (fora de 1/N/M) | erro (na declaração) |
 | E07 | Nomes duplicados no mesmo diagrama | erro |
-| E08 | Classe referenciada em `Link`/`Owner` fora do diagrama | erro |
+| E08 | Classe referenciada em `Link`/`Owner` fora do diagrama (ou alvo inválido: nem `Entity` nem `AssociativeRelationship`) | erro |
 
 Validação roda **antes** do layout. Diagrama inválido nunca gera SVG.
 
@@ -275,6 +283,7 @@ Tabela como implementada no M1 (ajustes do protótipo aprovados na spec — 11.4
 | `Edge.svg` | `<path>` | d |
 | `EdgeDouble.svg` | `<path>` em linha dupla | d (usado 2×: stroke grosso preto + stroke fino branco por cima) |
 | `EdgeLabel.svg` | `<text>` solto | x, y, text |
+| `Associative.svg` (fase 2) | `<rect>` + `<polygon>` (losango interno) | idem `Entity.svg` + points (losango a 60% da geom do nó, centralizado no mesmo cx/cy) |
 
 Ajustes na tabela original, com justificativa: fragmento não avalia expressões, então o
 composer passa valores pré-computados — `cx`/`cy` na entidade, `points` no losango; a
@@ -338,7 +347,8 @@ prometido em §1.2). Versão explícita em `format: 1`; chaves sempre nesta orde
 
 Regras do formato:
 
-- `kind` do nó ∈ {`entity`, `weak_entity`, `relationship`, `attribute`, `composite`};
+- `kind` do nó ∈ {`entity`, `weak_entity`, `relationship`, `associative`, `attribute`,
+  `composite`};
   `flags` só entra quando algum flag é true (o default é tudo false).
 - Aresta: `label` só entra quando não nulo; `total` só entra quando true.
 - `to_json() -> dict` (ordenado por inserção, canônico). Persistência em texto fica

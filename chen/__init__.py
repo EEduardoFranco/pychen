@@ -1,6 +1,7 @@
 """API pública declarativa (spec §4). Exemplo canônico: ver SPECS.md §4."""
 
 from chen.model import (
+    AssociativeRelationship,
     Attribute,
     Composite,
     Diagram,
@@ -12,6 +13,7 @@ from chen.model import (
 )
 
 __all__ = [
+    "AssociativeRelationship",
     "Attribute",
     "Composite",
     "Diagram",
