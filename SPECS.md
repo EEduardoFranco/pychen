@@ -465,7 +465,7 @@ deprecação.
 ### Fase 2 — Chen completo (0.4.x)
 
 - [x] ISA: triângulo, total/parcial, disjunta/sobreposta — commits `00bc572` (model/
-      serialize) e `f28e0a6` (render): descritor `ISA(SuperClass, total, disjoint)` no
+      serialize) e `8b0e901` (render): descritor `ISA(SuperClass, total, disjoint)` no
       corpo da filha, nó `ISATriangle`, rótulo `d`/`o` na `isa_super`, linha dupla
       quando total; subclasses isentas de E02 (chave é herança); snapshot do
       fragmento + golden v5 (hierarquia disjunta/total) revisados
