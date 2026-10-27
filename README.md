@@ -99,14 +99,28 @@ python examples/biblioteca.py    # a second domain: library loans
   test named after the rule; SVG snapshots are updated only consciously with
   `--snapshot-update` and reviewed in the diff.
 
-## AI-assisted development
+## Ownership, process and AI use
 
-The code in this repository was written with the assistance of an AI coding
-model for maximum productivity: **GLM-5.3-Flash**, provided free of charge by
-the [OpenCode](https://opencode.ai) harness.
+pychen was developed with the assistance of an AI coding model to accelerate
+the writing of code and documentation — not to make decisions for it. The
+design decisions, the review of every change and the ownership of this project
+are the author's, and they are kept honest by a process designed so that trust
+is earned, not assumed:
 
-Consistency does not come from trusting the assistant — it comes from process.
-Every change followed strict **TDD** (red → green → refactor) against the
-living spec in [SPECS.md](SPECS.md), backed by end-to-end golden tests and
-byte-for-byte SVG snapshot diffs. The AI contributed the typing; the tests,
-the spec and the review flow kept the output honest.
+- an explicit, living technical specification ([SPECS.md](SPECS.md)) — design
+  disputes are resolved in the spec *before* the code;
+- strict **TDD** (red → green → refactor): every behavior is born from a test
+  named after the rule it pins;
+- automated validation rules (E01–E08) and tests that verify the expected
+  behavior — a golden end-to-end pipeline test, byte-for-byte SVG snapshots
+  and idempotency checks;
+- deterministic output: the same declaration always produces the same SVG.
+
+The assistant used was **GLM-5.3-Flash**, provided free of charge by the
+[OpenCode](https://opencode.ai) harness. The goal is a useful tool for
+conceptual database modeling, with the architecture decisions documented and
+the implementation evolving in steps.
+
+**Author & maintainer:** Eduardo Franco
+([@EEduardoFranco](https://github.com/EEduardoFranco)) — see
+[DEMO.md](DEMO.md) for a short, honest walkthrough of the process in action.
