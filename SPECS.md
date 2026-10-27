@@ -3,7 +3,7 @@
 > A "bíblia" do projeto. Toda decisão de design passa por aqui: se não está na spec,
 > ou entra na spec, ou não entra no código.
 
-Status: v0.2 · Última atualização: 2026-10-26
+Status: v0.3 · Última atualização: 2026-10-26
 
 ---
 
@@ -226,7 +226,12 @@ Validação roda **antes** do layout. Diagrama inválido nunca gera SVG.
    dos splines + posição do label). Graphviz é chamado via **subprocess** (sem pygraphviz,
    que exige compilação no Windows). Se `dot` não estiver no PATH: erro claro com
    instrução de instalação. Dependência opcional: `pip install chen-diagram-lang[layout]`
-   documenta o requisito.
+   documenta o requisito. **Contrato do JSON (verificado com experimento real, Graphviz
+   16.1.0):** `bb = "0,0,W,H"` — o ymax é o **4º** número e o eixo y do graphviz cresce
+   para cima, então `y_svg = ymax - y`; nós em `objects` com `name` (`n{obj_id}`),
+   `pos = "x,y"` (centro, já em points) e `width`/`height` em polegadas (×72 → px);
+   arestas em `edges` com `tail`/`head` (`_gvid`), `pos` = spline `"x,y x,y ..."` e
+   `lp = "x,y"` — presente só quando a aresta tem `label`.
 4. **Compor SVG.** Um documento `<svg>` raiz; para cada nó, instancia o fragmento do
    template correspondente (seção 8) com parâmetros `x, y, w, h, text, variant`;
    arestas viram `<path>` com os splines do graphviz; rótulos de cardinalidade e
@@ -241,17 +246,31 @@ Validação roda **antes** do layout. Diagrama inválido nunca gera SVG.
 Cada arquivo em `templates/` contém um `<g class="...">` com a forma e o texto, e declara
 placeholders `{%param%}`. O documento raiz é gerado pelo composer.
 
+Tabela como implementada no M1 (ajustes do protótipo aprovados na spec — 11.4):
+
 | Template | Forma | Parâmetros |
 |---|---|---|
-| `Entity.svg` | `<rect>` | x, y, w, h, text |
-| `WeakEntity.svg` | `<rect>` duplo | x, y, w, h, text |
-| `Relationship.svg` | `<polygon>` (losango) | x, y, w, h, text |
-| `Attribute.svg` | `<ellipse>` com variantes | x, y, rx, ry, text, variant ∈ {simple, key, partial_key, multivalued, derived} |
-| `Edge.svg` | `<path>` | d, label, double |
+| `Entity.svg` | `<rect>` | x, y (topo-esquerda), w, h, cx, cy (centro do texto), text |
+| `WeakEntity.svg` | `<rect>` duplo | (M2) |
+| `Relationship.svg` | `<polygon>` (losango) | points (os 4 vértices), cx, cy, text |
+| `Attribute.svg` | `<ellipse>` | x, y (centro), rx, ry, text |
+| `Attribute_key.svg` | `<ellipse>` + sublinhado | idem `Attribute.svg` |
+| `Edge.svg` | `<path>` | d |
+| `EdgeLabel.svg` | `<text>` solto | x, y, text |
 
-O `template_loader.py` atual evolui para: carregar fragmento, descobrir placeholders por
-regex `{\%(\w+)\%}` e preencher via `format`-seguro (sem interpolar SVG do usuário —
-todo texto é escapado: `&`, `<`, `>`, `"`).
+Ajustes na tabela original, com justificativa: fragmento não avalia expressões, então o
+composer passa valores pré-computados — `cx`/`cy` na entidade, `points` no losango; a
+variante do atributo **escolhe o arquivo** (`variant="simple"` → `Attribute.svg`,
+`variant="key"` → `Attribute_key.svg`) em vez de entrar como parâmetro condicional dentro
+de um único template; o rótulo da aresta virou fragmento próprio (`EdgeLabel.svg`) para
+não existir `<text>` vazio quando a aresta não tem label. Os demais variants
+(`partial_key`, `multivalued`, `derived`) entram no M2 como arquivos novos seguinte o
+mesmo esquema.
+
+O `template_loader.py` carrega o fragmento, descobre placeholders por regex
+`{%(\w+)%}` e preenche por `str.replace` (nunca `format` — nenhum valor do usuário
+passa por interpolação de template); todo texto é escapado: `&`, `<`, `>`, `"`; e os
+números saem sempre com `f"{v:.2f}"` (determinismo byte a byte da seção 7).
 
 ---
 
@@ -297,14 +316,16 @@ Infraestrutura mínima para desenvolver com prazer.
 
 O caminho feliz completo, com notação mínima. Objetivo: provar o pipeline, não a cobertura.
 
-- [ ] Metaclass + `Entity` + `Attribute` (simples e chave) + `Relationship` + `Link`
-- [ ] Validações mínimas: E05, E06 (as que caem grátis na declaração)
-- [ ] Layout: modelo → DOT → `dot -Tjson` → posições
-- [ ] Render: fragmentos `Entity`/`Relationship`/`Attribute` + arestas + rótulo de cardinalidade
-- [ ] Golden test v1: `Cliente` + `Pedido` + `Faz` → SVG
+- [x] Metaclass + `Entity` + `Attribute` (simples e chave) + `Relationship` + `Link`
+      *(implementado via `__init_subclass__` + `__set_name__` — decisão registrada em §13)*
+- [x] Validações mínimas: E05, E06 (as que caem grátis na declaração) — mais E08, que caiu
+      de graça como guarda do consumo de links (`None` silencioso é violação do Zen)
+- [x] Layout: modelo → DOT → `dot -Tjson` → posições
+- [x] Render: fragmentos `Entity`/`Relationship`/`Attribute` + arestas + rótulo de cardinalidade
+- [x] Golden test v1: `Cliente` + `Pedido` + `Faz` → SVG (snapshot syrupy, revisado no preview)
 
-**DoD:** a versão reduzida do exemplo da seção 4 gera SVG válido, determinístico
-(duas execuções → bytes idênticos).
+**DoD:** ✅ verificado em 2026-10-26 — a versão reduzida do exemplo da seção 4 gera SVG
+válido e determinístico (duas execuções → bytes idênticos; 53 testes verdes com v0.1.0).
 
 ### M2 — Notação intermediária completa (v0.2.0)
 
@@ -394,7 +415,8 @@ Regras que valem para todo milestone:
   (`test_entidade_fraca_sem_chave_parcial_gera_E03`), não do método (`test_validate`).
 - **Bug corrigido = teste de regressão primeiro:** reproduzir o bug (Red), depois corrigir (Green).
 - **Golden test é a bússola do roadmap:** cada milestone estende o exemplo da seção 4 —
-  M1 roda a versão reduzida, M2 a versão completa.
+  M1 roda a versão reduzida, M2 a versão completa. O golden é de ponta a ponta: exige
+  `dot`, e pula com skip explícito (mesma disciplina dos testes de layout).
 - **SVG é comparado por snapshot** (determinismo byte a byte da seção 7). Atualização de
   snapshot é ato consciente, com `--snapshot-update`, e revisado no diff.
 - **Validações E01–E08 têm tabela de teste própria:** um teste por regra + o caso feliz.
@@ -462,3 +484,7 @@ de qualquer sessão é **seção 13 + seção 10**.
 | 2026-10-26 | M0 executado pelo agente implementador (git, venv, pacote `chen/`, migração do protótipo) | Pendente: `.agent-playground/` no `.gitignore` e limpeza do `demo.dot` da raiz |
 | 2026-10-26 | HANDOFF.md removido (conteúdo incorporado ao trabalho); item pendente do M0 fechado; `SPECS.md` v0.2 commitado | M0 ✅ |
 | 2026-10-26 | M1 iniciado — TDD camada model: testes Red em `tests/model/` | — |
+| 2026-10-26 | M1 model ✅ — `__init_subclass__` + `__set_name__` (não metaclass explícita; decisão do handoff confirmada no código), ids por diagrama (nós e arestas dividem a sequência), E05/E06/E08 | commit `741c098` |
+| 2026-10-26 | M1 layout ✅ — `to_dot` + `compute_layout`; contrato `-Tjson` anotado em §7 (ymax é o 4º número — corrigido por experimento, protótipo/handoff dizia 3º); testes skipam sem `dot` (§11.2) | — |
+| 2026-10-26 | M1 render ✅ — fragmentos + loader com escape + shapes + composer; desvios de template aprovados na spec §8 (cx/cy, points, variant→arquivo, EdgeLabel) | — |
+| 2026-10-26 | M1 ✅ DoD verificado — `to_svg`/`save` com import lazy; golden v1 com snapshot syrupy (pacote no PyPI se chama `syrupy`, não `pytest-syrupy`); versão 0.1.0 | M1 fechado |
