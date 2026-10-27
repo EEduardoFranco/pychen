@@ -448,8 +448,13 @@ deprecação.
 ### Fase 2 — Chen completo (0.4.x)
 
 - [ ] ISA: triângulo, total/parcial, disjunta/sobreposta
-- [ ] Entidade associativa (losango dentro de retângulo)
-- [ ] Serialização: `to_json()` / `from_json()` determinísticos (seção 9)
+- [x] Entidade associativa (losango dentro de retângulo) — commits `4de13ae` (model/
+      serialize) e `6bfc879` (render): subclasse `AssociativeRelationship`, passe de
+      arestas pendentes no build, alvo inválido é E08 (`Link target ...`), kind
+      `associative` no §9, fragmento `Associative.svg` (losango a 60% da geom),
+      3 testes de model + composer + snapshot de fragmento + golden v4
+- [x] Serialização: `to_json()` / `from_json()` determinísticos (seção 9) — formato
+      definido e testado (§9); golden v3 ainda valida JSON→SVG idêntico ao declarado
 - [ ] PNG como extra (`[png]`)
 
 ### Fase 3 — Diagramas lógicos (0.5.x)
@@ -591,6 +596,8 @@ de qualquer sessão é **seção 13 + seção 10**.
 | 2026-10-27 | **Fase 1 fechada** — v1.0.0, tag `1.0.0`; promessa: API declarativa não muda sem deprecação. PyPI: **não publicar** (decisão do usuário); push no GitHub (perfil `EEduardoFranco`) será feito por agente designado — o repo ainda não tem remoto | fase 1 ✅ |
 | 2026-10-27 | Fase 2 aberta (0.4.x). §9 formatado: grafo plano, `format: 1`, ids = posições canônicas (nós 1..N, arestas N+1..), omissão de flags/label/total quando default; `from_json` revalida e re-atribui — round-trip por construção + golden v3 (JSON → SVG == SVG declarado) | — |
 | 2026-10-27 | Refactor do validador: E03–E05 agora leem do **grafo** (contagem de arestas `link`/`owner`), não dos descritores de classe — o modelo carregado por JSON também obedece; nova checagem: `owner` apontando para entidade forte → E04 | — |
+| 2026-10-27 | Entidade associativa ✅ decisão de API por pergunta ao usuário: **subclasse dedicada** (`AssociativeRelationship`, estende `Relationship`) em vez de flag em `Meta`; render: losango a 60% da geom dentro do retângulo, revisado em SVG real no preview | sublista fase 2: 2/4 |
+| 2026-10-27 | Nota de robustez do build: `_build` agora resolve `Link` num passe de arestas pendentes (alvo declarado depois na lista); ordem de ids dos diagramas existentes inalterada — suites/goldens do M1/M2 passaram sem re-snapshot | — |
 | 2026-10-26 | HANDOFF.md removido (conteúdo incorporado ao trabalho); item pendente do M0 fechado; `SPECS.md` v0.2 commitado | M0 ✅ |
 | 2026-10-26 | M1 iniciado — TDD camada model: testes Red em `tests/model/` | — |
 | 2026-10-26 | M1 model ✅ — `__init_subclass__` + `__set_name__` (não metaclass explícita; decisão do handoff confirmada no código), ids por diagrama (nós e arestas dividem a sequência), E05/E06/E08 | commit `741c098` |
