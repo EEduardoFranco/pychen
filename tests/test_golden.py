@@ -12,7 +12,7 @@ import shutil
 
 import pytest
 
-from chen import Attribute, Diagram, Entity, Link, Relationship
+from chen import Attribute, Composite, Diagram, Entity, Link, Owner, Relationship, WeakEntity
 
 pytestmark = [
     pytest.mark.requires_dot,
@@ -35,3 +35,34 @@ def test_golden_v1_reduzido_do_exemplo_canonico(snapshot):
     diagrama = Diagram("Vendas", elements=[Cliente, Pedido, Faz])
 
     assert diagrama.to_svg() == snapshot
+
+
+def test_golden_v2_exemplo_canonico_completo(snapshot):
+    class Cliente(Entity):
+        cpf = Attribute(primary_key=True)
+        nome = Attribute()
+        telefones = Attribute(multivalued=True)
+        endereco = Composite(
+            rua=Attribute(),
+            numero=Attribute(),
+            cidade=Attribute(),
+        )
+
+    class Pedido(Entity):
+        numero = Attribute(primary_key=True)
+        data_emissao = Attribute(derived=True)
+
+    class ItemPedido(WeakEntity):
+        owner = Owner(Pedido)
+        codigo = Attribute(partial_key=True)
+        quantidade = Attribute()
+
+    class Faz(Relationship):
+        cliente = Link(Cliente, "1")
+        pedido = Link(Pedido, "N", total=True)
+        valor_total = Attribute(derived=True)
+
+    diagrama = Diagram("Vendas", elements=[Cliente, Pedido, ItemPedido, Faz])
+
+    assert diagrama.to_svg() == snapshot
+

@@ -3,7 +3,7 @@
 > A "bíblia" do projeto. Toda decisão de design passa por aqui: se não está na spec,
 > ou entra na spec, ou não entra no código.
 
-Status: v0.3 · Última atualização: 2026-10-26
+Status: v0.4 · Última atualização: 2026-10-27
 
 ---
 
@@ -190,6 +190,8 @@ Arestas do grafo:
 
 - `attributed_to` — atributo → (entidade | relacionamento | composto pai).
 - `link` — relacionamento → entidade, portando `cardinality` e `total`.
+- `owner` — dono → entidade fraca: total e cardinalidade exibida "(1,1)" por
+  definição (rótulo gerado internamente, não declarável).
 
 Invariantes (garantidos pelo construtor/metaclass, não pelo renderizador):
 
@@ -206,13 +208,19 @@ Invariantes (garantidos pelo construtor/metaclass, não pelo renderizador):
 | E01 | Atributo declarado mas nunca anexado a nada | erro |
 | E02 | Entidade forte sem atributo-chave | warning |
 | E03 | Entidade fraca sem chave parcial | erro |
-| E04 | Entidade fraca com mais de um dono | erro |
+| E04 | Contagem de dono errada: fraca com zero ou mais de um dono; `Owner` em entidade forte | erro |
 | E05 | Relacionamento com menos de 2 entidades | erro |
 | E06 | Cardinalidade inválida (fora de 1/N/M) | erro (na declaração) |
 | E07 | Nomes duplicados no mesmo diagrama | erro |
 | E08 | Classe referenciada em `Link`/`Owner` fora do diagrama | erro |
 
 Validação roda **antes** do layout. Diagrama inválido nunca gera SVG.
+
+Nota (E04, registada em 2026-10-27): a tabela original dizia "entidade fraca com mais de um dono";
+a implementação do M2 estendeu a regra para as três violações do invariante "exatamente
+um dono" (§5) — zero donos e `Owner` em entidade forte são o mesmo erro de contagem.
+Estado atual: E05/E06 chegaram no M1; E03/E04/E08 no M2 (o teste de E08 cobre Link **e**
+Owner). E01, E02 e E07 são do M3.
 
 ---
 
@@ -251,21 +259,33 @@ Tabela como implementada no M1 (ajustes do protótipo aprovados na spec — 11.4
 | Template | Forma | Parâmetros |
 |---|---|---|
 | `Entity.svg` | `<rect>` | x, y (topo-esquerda), w, h, cx, cy (centro do texto), text |
-| `WeakEntity.svg` | `<rect>` duplo | (M2) |
+| `WeakEntity.svg` | `<rect>` duplo | idem `Entity.svg` + x2, y2, w2, h2 (retângulo interno afastado 3px) |
 | `Relationship.svg` | `<polygon>` (losango) | points (os 4 vértices), cx, cy, text |
 | `Attribute.svg` | `<ellipse>` | x, y (centro), rx, ry, text |
 | `Attribute_key.svg` | `<ellipse>` + sublinhado | idem `Attribute.svg` |
+| `Attribute_partial_key.svg` | `<ellipse>` + sublinhado tracejado | idem `Attribute.svg` |
+| `Attribute_multivalued.svg` | `<ellipse>` dupla | idem `Attribute.svg` + rx2, ry2 (elipse interna, 3px a menos) |
+| `Attribute_derived.svg` | `<ellipse>` tracejada (`stroke-dasharray="4 3"`) | idem `Attribute.svg` |
 | `Edge.svg` | `<path>` | d |
+| `EdgeDouble.svg` | `<path>` em linha dupla | d (usado 2×: stroke grosso preto + stroke fino branco por cima) |
 | `EdgeLabel.svg` | `<text>` solto | x, y, text |
 
 Ajustes na tabela original, com justificativa: fragmento não avalia expressões, então o
 composer passa valores pré-computados — `cx`/`cy` na entidade, `points` no losango; a
 variante do atributo **escolhe o arquivo** (`variant="simple"` → `Attribute.svg`,
-`variant="key"` → `Attribute_key.svg`) em vez de entrar como parâmetro condicional dentro
-de um único template; o rótulo da aresta virou fragmento próprio (`EdgeLabel.svg`) para
-não existir `<text>` vazio quando a aresta não tem label. Os demais variants
-(`partial_key`, `multivalued`, `derived`) entram no M2 como arquivos novos seguinte o
-mesmo esquema.
+`variant="key"` → `Attribute_key.svg`, etc.) em vez de entrar como parâmetro condicional
+dentro de um único template; o rótulo da aresta virou fragmento próprio (`EdgeLabel.svg`)
+para não existir `<text>` vazio quando a aresta não tem label; a linha dupla da
+participação total é o par de paths do `EdgeDouble.svg` sobre os mesmos pontos.
+
+Nota de implementação do M2: o sublinhado tracejado da chave parcial usa CSS
+(`style="text-decoration: underline; text-decoration-style: dashed"`) — renderiza nos
+navegadores; rasterizadores sem suporte a `text-decoration-style` degradam para
+sublinhado sólido (aceito enquanto não houver exportação PNG/PDF).
+
+Snapshots de SVG por variante de forma vivem em `tests/render/test_snapshots.py`
+(11 testes, um por conceito — uma falha de regressão aparece no diff do `.ambr`).
+Não exigem `dot`: cobrem shapes + templates puros, isolados do layout.
 
 O `template_loader.py` carrega o fragmento, descobre placeholders por regex
 `{%(\w+)%}` e preenche por `str.replace` (nunca `format` — nenhum valor do usuário
@@ -331,11 +351,19 @@ válido e determinístico (duas execuções → bytes idênticos; 53 testes verd
 
 Completar a tabela da seção 2.
 
-- [ ] `WeakEntity` + `Owner` + `partial_key` (retângulo duplo, sublinhado tracejado)
-- [ ] `Composite` (elipse mãe + filhas), `multivalued` (elipse dupla), `derived` (tracejada)
-- [ ] Participação total (linha dupla) nas arestas
-- [ ] Atributos de relacionamento (elipse ligada ao losango)
-- [ ] Snapshots de SVG por variante de forma (uma falha de regressão = um arquivo diff-ável)
+- [x] `WeakEntity` + `Owner` + `partial_key` (retângulo duplo, sublinhado tracejado) —
+      com E03/E04; `Owner` em entidade forte é erro de contagem (nota em §6)
+- [x] `Composite` (elipse mãe + filhas), `multivalued` (elipse dupla), `derived` (tracejada) —
+      sub-nomes de `Composite` vêm dos kwargs (não passam por `__set_name__`)
+- [x] Participação total (linha dupla) nas arestas — `Link(total=True)` → `EdgeDouble.svg`
+- [x] Atributos de relacionamento (elipse ligada ao losango) — `Relationship` coleta os
+      seus `Attribute` como as entidades (bug do `self.nodes[-1]` corrigido por TDD)
+- [x] Snapshots de SVG por variante de forma (extensões do M1: um conceito por teste)
+
+**DoD:** ✅ verificado em 2026-10-27 — o exemplo canônico da seção 4, completo
+(Cliente + Pedido + ItemPedido + Faz, com Composite/multivalued/derived/partial_key/
+total/atributo de relacionamento), renderiza conforme a seção 2; golden v2 com snapshot
+revisado nas duas formas (estrutural e visual no preview); 99+ testes verdes.
 
 **DoD:** o exemplo canônico da seção 4, completo, renderiza conforme a seção 2.
 
@@ -484,6 +512,10 @@ de qualquer sessão é **seção 13 + seção 10**.
 | 2026-10-26 | M0 executado pelo agente implementador (git, venv, pacote `chen/`, migração do protótipo) | Pendente: `.agent-playground/` no `.gitignore` e limpeza do `demo.dot` da raiz |
 | 2026-10-26 | Tag `v0.1.0` criada no fechamento do M1 | — |
 | 2026-10-26 | M2 iniciado — TDD camada model: flags de atributo, `WeakEntity`/`Owner` (E03/E04), `Composite`, participação total e atributos de relacionamento | — |
+| 2026-10-27 | M2 model ✅ — flags não-padrão de `Attribute` + `variant` por prioridade (`partial_key > key > multivalued > derived > simple`), `WeakEntity`/`Owner`, `Composite`/`CompositeNode`, `Link(total)`, atributos de relacionamento; **bug apanado por TDD:** links saíam com `tail` no último nó porque `_build_links` lia `self.nodes[-1]` após copiar atributos do relacionamento | — |
+| 2026-10-27 | M2 layout ✅ — `EdgeGeom.total` propagado do modelo | — |
+| 2026-10-27 | M2 render ✅ — fragments `WeakEntity`/`Attribute_partial_key`/`Attribute_multivalued`/`Attribute_derived`/`EdgeDouble` (linha dupla = stroke grosso preto + stroke fino branco sobre os mesmos pontos); 11 snapshots por variante em `tests/render/test_snapshots.py` (não exigem `dot`) | — |
+| 2026-10-27 | M2 ✅ DoD verificado — golden v2 (exemplo canônico completo do §4) gerado e revisado; v0.2.0 | M2 fechado |
 | 2026-10-26 | HANDOFF.md removido (conteúdo incorporado ao trabalho); item pendente do M0 fechado; `SPECS.md` v0.2 commitado | M0 ✅ |
 | 2026-10-26 | M1 iniciado — TDD camada model: testes Red em `tests/model/` | — |
 | 2026-10-26 | M1 model ✅ — `__init_subclass__` + `__set_name__` (não metaclass explícita; decisão do handoff confirmada no código), ids por diagrama (nós e arestas dividem a sequência), E05/E06/E08 | commit `741c098` |

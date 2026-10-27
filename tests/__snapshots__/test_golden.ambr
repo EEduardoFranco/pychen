@@ -64,3 +64,166 @@
   
   '''
 # ---
+# name: test_golden_v2_exemplo_canonico_completo
+  '''
+  <svg xmlns="http://www.w3.org/2000/svg" width="772.66" height="286.00" viewBox="0 0 772.66 286.00">
+  <g class="edge">
+    <path d="M 234.30,107.07 L 247.37,122.56 L 267.65,146.59 L 281.02,162.43" fill="none" stroke="black" />
+  </g>
+  
+  <g class="edge">
+    <path d="M 297.79,109.09 L 297.09,124.16 L 296.08,146.01 L 295.38,161.15" fill="none" stroke="black" />
+  </g>
+  
+  <g class="edge">
+    <path d="M 374.61,107.87 L 356.70,123.67 L 329.41,147.76 L 311.78,163.32" fill="none" stroke="black" />
+  </g>
+  
+  <g class="edge">
+    <path d="M 158.61,105.90 L 189.38,122.33 L 240.18,149.45 L 270.21,165.49" fill="none" stroke="black" />
+  </g>
+  
+  <g class="edge">
+    <path d="M 196.77,33.03 L 183.39,44.91 L 164.21,61.93 L 150.30,74.27" fill="none" stroke="black" />
+  </g>
+  
+  <g class="edge">
+    <path d="M 59.30,34.06 L 74.98,46.02 L 96.81,62.69 L 112.56,74.72" fill="none" stroke="black" />
+  </g>
+  
+  <g class="edge">
+    <path d="M 132.58,36.19 L 132.58,47.35 L 132.58,61.84 L 132.58,72.97" fill="none" stroke="black" />
+  </g>
+  
+  <g class="edge">
+    <path d="M 593.57,109.09 L 594.44,124.16 L 595.70,146.01 L 596.58,161.15" fill="none" stroke="black" />
+  </g>
+  
+  <g class="edge">
+    <path d="M 690.14,108.27 L 668.98,124.32 L 636.95,148.63 L 616.65,164.03" fill="none" stroke="black" />
+  </g>
+  
+  <g class="edge">
+    <path d="M 404.39,195.17 L 423.11,210.60 L 452.49,234.80 L 471.89,250.78" fill="none" stroke="black" />
+  </g>
+  
+  <g class="edge">
+    <path d="M 491.58,197.59 L 491.58,212.66 L 491.58,234.51 L 491.58,249.65" fill="none" stroke="black" />
+  </g>
+  
+  <g class="edge edge-double">
+    <path d="M 579.60,195.17 L 560.70,210.60 L 531.04,234.80 L 511.46,250.78" fill="none" stroke="black" stroke-width="3.5" />
+    <path d="M 579.60,195.17 L 560.70,210.60 L 531.04,234.80 L 511.46,250.78" fill="none" stroke="white" stroke-width="1.4" />
+  </g>
+  
+  <g class="edge-label">
+    <text x="562.70" y="223.75" text-anchor="middle" dominant-baseline="middle" font-family="sans-serif" font-size="10">1,1</text>
+  </g>
+  
+  <g class="edge">
+    <path d="M 498.58,36.19 L 498.58,47.35 L 498.58,61.84 L 498.58,72.97" fill="none" stroke="black" />
+  </g>
+  
+  <g class="edge">
+    <path d="M 476.36,101.42 L 438.77,117.36 L 362.75,149.59 L 321.94,166.90" fill="none" stroke="black" />
+  </g>
+  
+  <g class="edge-label">
+    <text x="418.23" y="135.25" text-anchor="middle" dominant-baseline="middle" font-family="sans-serif" font-size="10">1</text>
+  </g>
+  
+  <g class="edge edge-double">
+    <path d="M 514.49,105.90 L 532.52,121.66 L 561.83,147.26 L 580.38,163.47" fill="none" stroke="black" stroke-width="3.5" />
+    <path d="M 514.49,105.90 L 532.52,121.66 L 561.83,147.26 L 580.38,163.47" fill="none" stroke="white" stroke-width="1.4" />
+  </g>
+  
+  <g class="edge-label">
+    <text x="561.82" y="135.25" text-anchor="middle" dominant-baseline="middle" font-family="sans-serif" font-size="10">N</text>
+  </g>
+  
+  <g class="entity">
+    <rect x="257.05" y="161.50" width="75.07" height="36.00" fill="white" stroke="black" />
+    <text x="294.58" y="179.50" text-anchor="middle" dominant-baseline="middle" font-family="sans-serif" font-size="12">Cliente</text>
+  </g>
+  
+  <g class="attribute attribute-key">
+    <ellipse cx="221.58" cy="91.00" rx="27.00" ry="18.00" fill="white" stroke="black" />
+    <text x="221.58" y="91.00" text-anchor="middle" dominant-baseline="middle" font-family="sans-serif" font-size="10" text-decoration="underline">cpf</text>
+  </g>
+  
+  <g class="attribute attribute-simple">
+    <ellipse cx="298.58" cy="91.00" rx="31.90" ry="18.00" fill="white" stroke="black" />
+    <text x="298.58" y="91.00" text-anchor="middle" dominant-baseline="middle" font-family="sans-serif" font-size="10">nome</text>
+  </g>
+  
+  <g class="attribute attribute-multivalued">
+    <ellipse cx="392.58" cy="91.00" rx="44.19" ry="18.00" fill="white" stroke="black" />
+    <ellipse cx="392.58" cy="91.00" rx="41.19" ry="15.00" fill="white" stroke="black" />
+    <text x="392.58" y="91.00" text-anchor="middle" dominant-baseline="middle" font-family="sans-serif" font-size="10">telefones</text>
+  </g>
+  
+  <g class="attribute attribute-simple">
+    <ellipse cx="132.58" cy="91.00" rx="44.19" ry="18.00" fill="white" stroke="black" />
+    <text x="132.58" y="91.00" text-anchor="middle" dominant-baseline="middle" font-family="sans-serif" font-size="10">endereco</text>
+  </g>
+  
+  <g class="attribute attribute-simple">
+    <ellipse cx="212.58" cy="18.00" rx="27.00" ry="18.00" fill="white" stroke="black" />
+    <text x="212.58" y="18.00" text-anchor="middle" dominant-baseline="middle" font-family="sans-serif" font-size="10">rua</text>
+  </g>
+  
+  <g class="attribute attribute-simple">
+    <ellipse cx="39.58" cy="18.00" rx="39.58" ry="18.00" fill="white" stroke="black" />
+    <text x="39.58" y="18.00" text-anchor="middle" dominant-baseline="middle" font-family="sans-serif" font-size="10">numero</text>
+  </g>
+  
+  <g class="attribute attribute-simple">
+    <ellipse cx="132.58" cy="18.00" rx="34.97" ry="18.00" fill="white" stroke="black" />
+    <text x="132.58" y="18.00" text-anchor="middle" dominant-baseline="middle" font-family="sans-serif" font-size="10">cidade</text>
+  </g>
+  
+  <g class="entity">
+    <rect x="561.07" y="161.50" width="73.02" height="36.00" fill="white" stroke="black" />
+    <text x="597.58" y="179.50" text-anchor="middle" dominant-baseline="middle" font-family="sans-serif" font-size="12">Pedido</text>
+  </g>
+  
+  <g class="attribute attribute-key">
+    <ellipse cx="592.58" cy="91.00" rx="39.58" ry="18.00" fill="white" stroke="black" />
+    <text x="592.58" y="91.00" text-anchor="middle" dominant-baseline="middle" font-family="sans-serif" font-size="10" text-decoration="underline">numero</text>
+  </g>
+  
+  <g class="attribute attribute-derived">
+    <ellipse cx="711.58" cy="91.00" rx="61.07" ry="18.00" fill="white" stroke="black" stroke-dasharray="4 3" />
+    <text x="711.58" y="91.00" text-anchor="middle" dominant-baseline="middle" font-family="sans-serif" font-size="10">data_emissao</text>
+  </g>
+  
+  <g class="entity entity-weak">
+    <rect x="437.67" y="250.00" width="107.82" height="36.00" fill="white" stroke="black" />
+    <rect x="440.67" y="253.00" width="101.82" height="30.00" fill="white" stroke="black" />
+    <text x="491.58" y="268.00" text-anchor="middle" dominant-baseline="middle" font-family="sans-serif" font-size="12">ItemPedido</text>
+  </g>
+  
+  <g class="attribute attribute-partial-key">
+    <ellipse cx="386.58" cy="179.50" rx="36.00" ry="18.00" fill="white" stroke="black" />
+    <text x="386.58" y="179.50" text-anchor="middle" dominant-baseline="middle" font-family="sans-serif" font-size="10" style="text-decoration: underline; text-decoration-style: dashed">codigo</text>
+  </g>
+  
+  <g class="attribute attribute-simple">
+    <ellipse cx="491.58" cy="179.50" rx="51.35" ry="18.00" fill="white" stroke="black" />
+    <text x="491.58" y="179.50" text-anchor="middle" dominant-baseline="middle" font-family="sans-serif" font-size="10">quantidade</text>
+  </g>
+  
+  <g class="relationship">
+    <polygon points="471.58,91.00 498.58,73.00 525.58,91.00 498.58,109.00" fill="white" stroke="black" />
+    <text x="498.58" y="91.00" text-anchor="middle" dominant-baseline="middle" font-family="sans-serif" font-size="12">Faz</text>
+  </g>
+  
+  <g class="attribute attribute-derived">
+    <ellipse cx="498.58" cy="18.00" rx="50.84" ry="18.00" fill="white" stroke="black" stroke-dasharray="4 3" />
+    <text x="498.58" y="18.00" text-anchor="middle" dominant-baseline="middle" font-family="sans-serif" font-size="10">valor_total</text>
+  </g>
+  
+  </svg>
+  
+  '''
+# ---
