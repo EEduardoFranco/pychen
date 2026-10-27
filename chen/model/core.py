@@ -24,6 +24,8 @@ from chen.model.validate import validate_diagram
 ATTRIBUTED_TO = "attributed_to"
 LINK = "link"
 OWNER = "owner"
+ISA_CHILD = "isa_child"
+ISA_SUPER = "isa_super"
 
 
 class Identifier:
@@ -70,12 +72,14 @@ class Diagram:
         relationship_classes = [e for e in self.elements if issubclass(e, Relationship)]
 
         instances: dict[type, Entity | Relationship] = {}
+        pendentes_isa: list[tuple] = []
         for entity_class in entity_classes:
             self._check_no_owner_on_strong(entity_class)
             instance = entity_class()
             instances[entity_class] = instance
             self._new_node(instance)
             self._copy_attributes(entity_class, instance)
+            pendentes_isa.extend(self._build_isas(entity_class, instance, instances))
             if issubclass(entity_class, WeakEntity):
                 self._build_owners(entity_class, instance, instances)
 
@@ -87,13 +91,46 @@ class Diagram:
             self._copy_attributes(relationship_class, instance)
             pendentes.extend(self._build_links(relationship_class, instance, instances))
 
-        # passe de arestas pendentes (§5): alvo declarado depois na lista resolve
-        # aqui; a ordem de ids dos diagramas sem associação fica inalterada
+        # passe único de pendências (§5, fase 2): superclasse ISA e alvos de Link
+        # declarados depois na lista resolvem aqui; a ordem dos ids dos diagramas
+        # sem essas referências fica inalterada
+        for isa_descriptor, triangulo in pendentes_isa:
+            super_instance = instances.get(isa_descriptor.superclass)
+            if super_instance is None:
+                raise self._e08(isa_descriptor.superclass, via="ISA")
+            self._new_isa_super_edge(triangulo, super_instance, isa_descriptor)
+
         for link, relationship in pendentes:
             target_instance = instances.get(link.target)
             if target_instance is None:
                 raise self._e08(link.target)
             self._new_link_edge(relationship, target_instance, link)
+
+    def _build_isas(self, entity_class: type, sub, instances: dict) -> list[tuple]:
+        from chen.model.isa import ISATriangle  # isolated import: evitar ciclo
+
+        pendentes = []
+        for isa_descriptor in entity_class.__chen_isas__:
+            triangulo = ISATriangle(total=isa_descriptor.total, disjoint=isa_descriptor.disjoint)
+            self._new_node(triangulo)
+            self._new_edge(Edge(tail=sub.obj_id, head=triangulo.obj_id, kind=ISA_CHILD))
+            super_instance = instances.get(isa_descriptor.superclass)
+            if super_instance is None:
+                pendentes.append((isa_descriptor, triangulo))
+                continue
+            self._new_isa_super_edge(triangulo, super_instance, isa_descriptor)
+        return pendentes
+
+    def _new_isa_super_edge(self, triangulo, super_instance, isa_descriptor) -> None:
+        self._new_edge(
+            Edge(
+                tail=triangulo.obj_id,
+                head=super_instance.obj_id,
+                kind=ISA_SUPER,
+                label="d" if isa_descriptor.disjoint else "o",
+                total=isa_descriptor.total,
+            )
+        )
 
     def _check_no_owner_on_strong(self, entity_class: type) -> None:
         if issubclass(entity_class, WeakEntity):
@@ -173,10 +210,10 @@ class Diagram:
             self._new_edge(Edge(tail=attribute.obj_id, head=composite.obj_id, kind=ATTRIBUTED_TO))
 
     @staticmethod
-    def _e08(target: type) -> ValidationError:
+    def _e08(target: type, via: str = "Link/Owner") -> ValidationError:
         return ValidationError(
             "E08",
-            f'entity "{target.__name__}" referenced in Link/Owner is not in the diagram elements',
+            f'entity "{target.__name__}" referenced in {via} is not in the diagram elements',
         )
 
     @classmethod

@@ -21,6 +21,9 @@ class Entity:
         cls.__chen_attributes__ = [
             value for value in vars(cls).values() if isinstance(value, (Attribute, Composite))
         ]
+        from chen.model.isa import ISA  # isolated import: evitar ciclo (isa não importa daqui)
+
+        cls.__chen_isas__ = [value for value in vars(cls).values() if isinstance(value, ISA)]
 
     def __init__(self) -> None:
         self.name: str = display_name(type(self))

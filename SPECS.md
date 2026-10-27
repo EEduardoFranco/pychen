@@ -188,6 +188,14 @@ Nós do grafo:
   `Relationship` (decisão de 2026-10-27, registrada em §13); pode ser **alvo de
   `Link`** de outros relacionamentos.
 - `Attribute(name, flags)` — flags: `primary_key`, `multivalued`, `derived`, `partial_key`.
+- `ISATriangle(total, disjoint)` — **triângulo de hierarquia ISA** (fase 2): nó sem
+  texto; `isa_child` (subclasse → triângulo) e `isa_super` (triângulo → superclasse,
+  rótulo `d` quando disjunta e `o` quando sobreposta; linha dupla quando `total`).
+- `ISA(SuperClass, total=False, disjoint=False)` — **descritor de subclasse**
+  (fase 2), declarado no corpo da `Entity` filha (estilo `Owner`/`Link`): um
+  descritor por subclasse → um triângulo; filhas coerrentes de uma mesma
+  hierarquia gera também geram um triângulo por filha (independentes — decisão de
+  2026-10-27 em §13; composição simples vence triângulo compartilhado).
 - `Composite(name, attributes)` — nó que agrega sub-atributos; renderiza como elipse
   mãe + elipses filhas ligadas.
 
@@ -203,9 +211,12 @@ Invariantes (garantidos pelo construtor/metaclass, não pelo renderizador):
 - Aresta `link` só conecta `Relationship` a (`Entity` | `AssociativeRelationship`).
 - Cardinalidade ∈ {"1", "N", "M"}.
 - `WeakEntity` tem `owner`; `Entity` não pode ter `owner`.
+- Aresta `isa_child` só conecta `Entity` (subclasse) a `ISATriangle`;
+  `isa_super` conecta o triângulo à superclasse declarada no descritor.
 - Backtracking de alvos (fase 2): um `Link` para entidade associativa declarada
   **depois** na lista `elements` resolve num passe de arestas pendentes no fim do
   build — a ordem dos ids dos diagramas sem associação fica inalterada.
+  Superclasse ISA pendente usa o mesmo passe.
 
 ---
 
@@ -235,6 +246,10 @@ Duas notas de interpretação:
   inclusive a serialização da fase 2.
 - **E07** vale para nomes de **entidades e relacionamentos**; nomes de atributos são
   locais (filhos de compostos repetem-se por natureza).
+- **E02** isenta subclasses de hierarquia ISA (fase 2): a chave é herança da
+  classe-pai; a subclasse tem aresta `isa_child` saindo dela. O triângulo ISA em si
+  não entra na lista de nomes do E07 (sem nome de usuário) e o invariante
+  "1 super, ≥ 1 sub" é garantido pelo build (nota em §9).
 
 ---
 
@@ -348,9 +363,11 @@ prometido em §1.2). Versão explícita em `format: 1`; chaves sempre nesta orde
 Regras do formato:
 
 - `kind` do nó ∈ {`entity`, `weak_entity`, `relationship`, `associative`, `attribute`,
-  `composite`};
+  `composite`, `isa`}; para `isa`, `total`/`disjoint` entram só quando true.
   `flags` só entra quando algum flag é true (o default é tudo false).
 - Aresta: `label` só entra quando não nulo; `total` só entra quando true.
+  Kinds de aresta ∈ {`attributed_to`, `link`, `owner`, `isa_child`, `isa_super`}
+  (fase 2 acrescentou os dois últimos; `isa_super` carrega `label` = `d`/`o`).
 - `to_json() -> dict` (ordenado por inserção, canônico). Persistência em texto fica
   com o chamador (`json.dumps`), pois queremos dict de teste dourado.
 - `from_json(data) -> Diagram` (classmethod): revalida tudo (`validate_diagram`),

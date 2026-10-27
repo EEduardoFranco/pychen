@@ -17,6 +17,7 @@ from typing import TYPE_CHECKING
 from chen.exceptions import ValidationError
 from chen.model.attributes import Attribute, CompositeNode
 from chen.model.entities import Entity, WeakEntity
+from chen.model.isa import ISATriangle
 
 if TYPE_CHECKING:
     from chen.model.core import Diagram
@@ -25,6 +26,7 @@ if TYPE_CHECKING:
 def validate_diagram(diagram: Diagram) -> None:
     from chen.model.core import (  # isolated import: core importa este módulo
         ATTRIBUTED_TO,
+        ISA_CHILD,
         LINK,
         OWNER,
     )
@@ -39,9 +41,13 @@ def validate_diagram(diagram: Diagram) -> None:
         elif isinstance(node, WeakEntity):
             element_names.append(node.name)
             _validate_weak(node, donos)
+        elif isinstance(node, ISATriangle):
+            # invariante "1 super, ≥ 1 sub" garantido no build (§5/§9): sem regra E*
+            # e sem nome de usuário — fora da lista do E07 (anotação em §6)
+            continue
         elif isinstance(node, Entity):
             element_names.append(node.name)
-            _validate_strong_key(node)
+            _validate_strong_key(node, diagram.edges, ISA_CHILD)
             _validate_no_owner_on_strong(node, donos)
         else:
             element_names.append(node.name)
@@ -60,7 +66,10 @@ def _validate_attachment(node, edges, kind: str) -> None:
         )
 
 
-def _validate_strong_key(entity) -> None:
+def _validate_strong_key(entity, edges, kind_isa_child: str) -> None:
+    # subclasses ISA são isentas (§6): a chave é herança da classe-pai
+    if any(edge.tail == entity.obj_id and edge.kind == kind_isa_child for edge in edges):
+        return
     if not any(attribute.primary_key for attribute in entity.attributes):
         warnings.warn(
             f'E02: strong entity "{entity.name}" has no primary key attribute',

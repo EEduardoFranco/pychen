@@ -1,6 +1,7 @@
 from chen.model.attributes import VALID_VARIANTS, Attribute, Composite, CompositeNode
 from chen.model.core import Diagram, Edge, Identifier
 from chen.model.entities import Entity, WeakEntity
+from chen.model.isa import ISA, ISATriangle
 from chen.model.relationships import AssociativeRelationship, Link, Owner, Relationship
 from chen.model.validate import validate_diagram
 
@@ -12,6 +13,8 @@ __all__ = [
     "Diagram",
     "Edge",
     "Entity",
+    "ISA",
+    "ISATriangle",
     "Identifier",
     "Link",
     "Owner",

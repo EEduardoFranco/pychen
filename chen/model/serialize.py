@@ -15,6 +15,8 @@ from __future__ import annotations
 from chen.model.attributes import Attribute, CompositeNode
 from chen.model.core import (
     ATTRIBUTED_TO,
+    ISA_CHILD,
+    ISA_SUPER,
     LINK,
     OWNER,
     Diagram,
@@ -22,12 +24,13 @@ from chen.model.core import (
     Identifier,
 )
 from chen.model.entities import Entity, WeakEntity
+from chen.model.isa import ISATriangle
 from chen.model.relationships import AssociativeRelationship, Relationship
 from chen.model.validate import validate_diagram
 
 FORMAT_VERSION = 1
 _FLAGS = ("primary_key", "multivalued", "derived", "partial_key")
-_EDGE_KINDS = (ATTRIBUTED_TO, LINK, OWNER)
+_EDGE_KINDS = (ATTRIBUTED_TO, LINK, OWNER, ISA_CHILD, ISA_SUPER)
 
 
 def to_json(diagram: Diagram) -> dict:
@@ -56,6 +59,12 @@ def from_json(data: dict) -> Diagram:
 
 def _node_to_json(node, obj_id: int) -> dict:
     entry: dict = {"obj_id": obj_id, "kind": node_kind(node), "name": node.name}
+    if isinstance(node, ISATriangle):
+        if node.total:
+            entry["total"] = True
+        if node.disjoint:
+            entry["disjoint"] = True
+        return entry
     flags = _flags_of(node)
     if any(flags.values()):
         entry["flags"] = flags
@@ -67,6 +76,8 @@ def node_kind(node) -> str:
         return "weak_entity"
     if isinstance(node, AssociativeRelationship):
         return "associative"
+    if isinstance(node, ISATriangle):
+        return "isa"
     if isinstance(node, Entity):
         return "entity"
     if isinstance(node, Relationship):
@@ -146,6 +157,10 @@ def _node_from(raw: dict):
         return node
     if kind == "composite":
         return CompositeNode(name)
+    if kind == "isa":
+        return ISATriangle(
+            total=bool(raw.get("total", False)), disjoint=bool(raw.get("disjoint", False))
+        )
     raise ValueError(f'unknown node kind "{kind}"')
 
 

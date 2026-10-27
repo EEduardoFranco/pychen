@@ -215,6 +215,30 @@ class TestRoundtripCompleto:
 
         assert recarregado.name == "Vendas"
 
+    def test_kind_isa_preserva_total_e_disjoint_no_roundtrip(self):
+        from chen.model import ISA
+
+        class Pessoa(Entity):
+            cpf = Attribute(primary_key=True)
+
+        class Aluno(Entity):
+            ra = Attribute()
+            isa = ISA(Pessoa, total=True, disjoint=True)
+
+        original = Diagram("U", elements=[Pessoa, Aluno])
+
+        recarregado = Diagram.from_json(original.to_json())
+
+        assert recarregado.to_json() == original.to_json()
+        dump = recarregado.to_json()
+        nos_isa = [node for node in dump["nodes"] if node["kind"] == "isa"]
+        assert len(nos_isa) == 1
+        assert nos_isa[0]["total"] is True and nos_isa[0]["disjoint"] is True
+        arestas = {edge["kind"] for edge in dump["edges"]}
+        assert arestas == {"isa_child", "isa_super", "attributed_to"}
+        supers = [edge for edge in dump["edges"] if edge["kind"] == "isa_super"]
+        assert supers[0]["label"] == "d" and supers[0]["total"] is True
+
     def test_kind_associativo_preserva_se_no_roundtrip(self):
         from chen.model import AssociativeRelationship
 
