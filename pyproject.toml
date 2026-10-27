@@ -6,6 +6,8 @@ build-backend = "setuptools.build_meta"
 name = "chen-diagram-lang"
 version = "1.0.0"
 description = "DSL em Python para diagramas conceituais de banco de dados (notação de Chen) com renderização SVG."
+license = "MIT"
+authors = [{ name = "Eduardo Franco", email = "dudufranco25@gmail.com" }]
 requires-python = ">=3.10"
 dependencies = []
 
