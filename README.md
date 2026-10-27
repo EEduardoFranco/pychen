@@ -98,3 +98,15 @@ python examples/biblioteca.py    # a second domain: library loans
 - **Process:** strict TDD (red → green → refactor). Every behavior lives in a
   test named after the rule; SVG snapshots are updated only consciously with
   `--snapshot-update` and reviewed in the diff.
+
+## AI-assisted development
+
+The code in this repository was written with the assistance of an AI coding
+model for maximum productivity: **GLM-5.3-Flash**, provided free of charge by
+the [OpenCode](https://opencode.ai) harness.
+
+Consistency does not come from trusting the assistant — it comes from process.
+Every change followed strict **TDD** (red → green → refactor) against the
+living spec in [SPECS.md](SPECS.md), backed by end-to-end golden tests and
+byte-for-byte SVG snapshot diffs. The AI contributed the typing; the tests,
+the spec and the review flow kept the output honest.
