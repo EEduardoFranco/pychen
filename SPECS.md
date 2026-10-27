@@ -1,4 +1,4 @@
-# SPECS — chen-diagram-lang
+# SPECS — pychen
 
 > A "bíblia" do projeto. Toda decisão de design passa por aqui: se não está na spec,
 > ou entra na spec, ou não entra no código.
@@ -9,7 +9,7 @@ Status: v0.5 · Última atualização: 2026-10-27 · **fase 1 fechada (v1.0.0)**
 
 ## 1. Visão
 
-**chen-diagram-lang** é uma DSL embutida em Python para representar diagramas
+**pychen** é uma DSL embutida em Python para representar diagramas
 conceituais de bancos de dados (notação de Chen) e renderizá-los em SVG.
 
 A declaração do diagrama é código Python idiomático (estilo Django models).
@@ -75,8 +75,8 @@ que ela introduz.** Sem resposta, a mudança não entra.
 | Cardinalidade (1, N, M) | rótulo na aresta | ✅ |
 | Participação parcial/total | linha simples / linha dupla | ✅ |
 | Atributo de relacionamento | elipse ligada ao losango | ✅ |
-| ISA | triângulo | ❌ fase 2 |
-| Entidade associativa | losango dentro de retângulo | 🔨 fase 2 |
+| ISA | triângulo | ✅ (fase 2) |
+| Entidade associativa | losango dentro de retângulo | ✅ (fase 2) |
 
 Cardinalidades válidas: `"1"`, `"N"`, `"M"` (validadas; qualquer outra coisa é erro).
 
@@ -102,7 +102,7 @@ Três camadas, dependências só apontando para baixo:
 Estrutura de pacotes proposta:
 
 ```
-chen/
+pychen/
   __init__.py          # API pública
   model/
     core.py            # Diagram, identificação, metaclass
@@ -128,7 +128,7 @@ specs.md               # este arquivo
 Este exemplo é o **golden test** do projeto. Se ele compilar e renderizar, a spec está viva.
 
 ```python
-from chen import Diagram, Entity, WeakEntity, Relationship, Attribute, Composite, Link, Owner
+from pychen import Diagram, Entity, WeakEntity, Relationship, Attribute, Composite, Link, Owner
 
 class Cliente(Entity):
     cpf = Attribute(primary_key=True)
@@ -262,7 +262,7 @@ Duas notas de interpretação:
 3. **`dot -Tjson`** → extrair, por nó: `x, y, width, height` (e por aresta: polilinha
    dos splines + posição do label). Graphviz é chamado via **subprocess** (sem pygraphviz,
    que exige compilação no Windows). Se `dot` não estiver no PATH: erro claro com
-   instrução de instalação. Dependência opcional: `pip install chen-diagram-lang[layout]`
+   instrução de instalação. Dependência opcional: `pip install pychen[layout]`
    documenta o requisito. **Contrato do JSON (verificado com experimento real, Graphviz
    16.1.0):** `bb = "0,0,W,H"` — o ymax é o **4º** número e o eixo y do graphviz cresce
    para cima, então `y_svg = ymax - y`; nós em `objects` com `name` (`n{obj_id}`),
@@ -328,7 +328,7 @@ números saem sempre com `f"{v:.2f}"` (determinismo byte a byte da seção 7).
 
 O modelo grafo terá `to_json()` / `from_json()` canônicos:
 
-- Servem para testes dourados, cache e futura CLI (`chen render input.json`).
+- Servem para testes dourados, cache e futura CLI (`pychen render input.json`).
 - IDs são determinísticos (ordem da lista `elements` + ordem de declaração dos descritores).
 - **Nenhum estado visual entra no modelo — o JSON é só semântica.**
 
@@ -405,6 +405,8 @@ Infraestrutura mínima para desenvolver com prazer.
       para `chen/model/` — o código atual vira a base, não é jogado fora
 - [x] `.agent-playground/` prevista no `.gitignore` — seção 11.3
       *(fechado na sessão de 2026-10-26: entrada adicionada ao `.gitignore` e `demo.dot` apagado da raiz)*
+- [ ] Renomear pacote `chen/` → `pychen/` e alinhar `pyproject.toml` (nome do projeto: `pychen`)
+      — decisão de nome de 2026-10-27; atualizar imports, `tests/` e refazer o install editável
 
 **DoD:** `pip install -e .` e `pytest` verdes rodando localmente.
 
@@ -440,8 +442,6 @@ Completar a tabela da seção 2.
 (Cliente + Pedido + ItemPedido + Faz, com Composite/multivalued/derived/partial_key/
 total/atributo de relacionamento), renderiza conforme a seção 2; golden v2 com snapshot
 revisado nas duas formas (estrutural e visual no preview); 99+ testes verdes.
-
-**DoD:** o exemplo canônico da seção 4, completo, renderiza conforme a seção 2.
 
 ### M3 — Robustez e DX (v0.3.0 → fecha a fase 1)
 
@@ -489,7 +489,7 @@ deprecação.
 
 ### Backlog (sem compromisso, sem data)
 
-- CLI (`chen render diagram.py -o out.svg`)
+- CLI (`pychen render diagram.py -o out.svg`)
 - CI (quando o projeto ganhar um repositório remoto)
 - Export para DOT e Mermaid (embed em GitHub/Notion)
 - Notação pé-de-galinha (crow's foot) reutilizando o mesmo modelo
@@ -542,8 +542,8 @@ Regras que valem para todo milestone:
 - **SVG é comparado por snapshot** (determinismo byte a byte da seção 7). Atualização de
   snapshot é ato consciente, com `--snapshot-update`, e revisado no diff.
 - **Validações E01–E08 têm tabela de teste própria:** um teste por regra + o caso feliz.
-- **Estrutura de `tests/` espelha `chen/`:** `tests/model/`, `tests/layout/`, `tests/render/`.
-- **Cobertura** medida com `pytest-cov`; alvo explícito: 100% em `chen/model`. Nas outras
+- **Estrutura de `tests/` espelha `pychen/`:** `tests/model/`, `tests/layout/`, `tests/render/`.
+- **Cobertura** medida com `pytest-cov`; alvo explícito: 100% em `pychen/model`. Nas outras
   camadas, o número é indicador — quem manda é o teste, não o percentual.
 - `pytest` é o único runner; testes não exigem `dot` instalado exceto os de `tests/layout/`,
   que pulam com marcador próprio quando o executável não existe (skips explícitos, nunca erros).
@@ -585,7 +585,11 @@ O agente trabalha **com o roadmap aberto** (seção 10) e o mantém vivo enquant
 
 ## 12. Convenções
 
-- Pacote: `chen` (repositório: `chen-diagram-lang`). Python ≥ 3.10.
+- Pacote e repositório: **pychen** (nome histórico: `chen` / `chen-diagram-lang`). Python ≥ 3.10.
+- Descrição pública (PyPI/About, 233 car.): "Pythonic DSL for Chen-notation conceptual
+  database diagrams: declare entities, relationships and attributes as plain Python
+  classes and render deterministic, graphviz-laid-out SVG. Simple and functional over
+  complex and hard to read."
 - Nomes públicos da API em inglês; documentação e mensagens de erro em inglês;
   discussão/spec em português.
 - Testes: TDD com `pytest` — a **seção 11 é a autoridade**; nada aqui a sobrepõe.
@@ -604,6 +608,7 @@ de qualquer sessão é **seção 13 + seção 10**.
 | 2026-10-26 | Spec v0.1 criada — decisões de API, layout, escopo, roadmap | — |
 | 2026-10-26 | Spec v0.2 — Zen como filosofia (seção 1), TDD + venv (seção 11), playground (11.3), acompanhamento (11.4) | — |
 | 2026-10-26 | M0 executado pelo agente implementador (git, venv, pacote `chen/`, migração do protótipo) | Pendente: `.agent-playground/` no `.gitignore` e limpeza do `demo.dot` da raiz |
+| 2026-10-27 | Nome oficial do projeto: **pychen** — spec atualizada (visão, arquitetura, imports, CLI, convenções, descrição pública de 233 car.) | Pendente: renomear pacote `chen/` → `pychen/` (item do M0) |
 | 2026-10-26 | Tag `v0.1.0` criada no fechamento do M1 | — |
 | 2026-10-26 | M2 iniciado — TDD camada model: flags de atributo, `WeakEntity`/`Owner` (E03/E04), `Composite`, participação total e atributos de relacionamento | — |
 | 2026-10-27 | M2 model ✅ — flags não-padrão de `Attribute` + `variant` por prioridade (`partial_key > key > multivalued > derived > simple`), `WeakEntity`/`Owner`, `Composite`/`CompositeNode`, `Link(total)`, atributos de relacionamento; **bug apanado por TDD:** links saíam com `tail` no último nó porque `_build_links` lia `self.nodes[-1]` após copiar atributos do relacionamento | — |
