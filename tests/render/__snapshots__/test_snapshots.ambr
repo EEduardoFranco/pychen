@@ -89,6 +89,14 @@
   
   '''
 # ---
+# name: test_snapshot_fragmento_isa_triangle
+  '''
+  <g class="isa">
+    <polygon points="30.00,55.00 70.00,55.00 50.00,25.00" fill="white" stroke="black" />
+  </g>
+  
+  '''
+# ---
 # name: test_snapshot_fragmento_relationship
   '''
   <g class="relationship">

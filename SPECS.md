@@ -464,7 +464,11 @@ deprecação.
 
 ### Fase 2 — Chen completo (0.4.x)
 
-- [ ] ISA: triângulo, total/parcial, disjunta/sobreposta
+- [x] ISA: triângulo, total/parcial, disjunta/sobreposta — commits `00bc572` (model/
+      serialize) e `f28e0a6` (render): descritor `ISA(SuperClass, total, disjoint)` no
+      corpo da filha, nó `ISATriangle`, rótulo `d`/`o` na `isa_super`, linha dupla
+      quando total; subclasses isentas de E02 (chave é herança); snapshot do
+      fragmento + golden v5 (hierarquia disjunta/total) revisados
 - [x] Entidade associativa (losango dentro de retângulo) — commits `4de13ae` (model/
       serialize) e `6bfc879` (render): subclasse `AssociativeRelationship`, passe de
       arestas pendentes no build, alvo inválido é E08 (`Link target ...`), kind
@@ -615,6 +619,7 @@ de qualquer sessão é **seção 13 + seção 10**.
 | 2026-10-27 | Refactor do validador: E03–E05 agora leem do **grafo** (contagem de arestas `link`/`owner`), não dos descritores de classe — o modelo carregado por JSON também obedece; nova checagem: `owner` apontando para entidade forte → E04 | — |
 | 2026-10-27 | Entidade associativa ✅ decisão de API por pergunta ao usuário: **subclasse dedicada** (`AssociativeRelationship`, estende `Relationship`) em vez de flag em `Meta`; render: losango a 60% da geom dentro do retângulo, revisado em SVG real no preview | sublista fase 2: 2/4 |
 | 2026-10-27 | Nota de robustez do build: `_build` agora resolve `Link` num passe de arestas pendentes (alvo declarado depois na lista); ordem de ids dos diagramas existentes inalterada — suites/goldens do M1/M2 passaram sem re-snapshot | — |
+| 2026-10-27 | Hierarquia ISA ✅ — decisão de API consistente com a associativa: **descritor** `ISA(SuperClass, total, disjoint)` no corpo da filha (estilo Owner/Link), não subclasse dedicada (a subclasse continua sendo uma `Entity` comum). Um descritor por subclasse → um triângulo (filhas da mesma hierarquia = triângulos independentes; triângulo compartilhado no backlog se o uso pedir). Layout não mudou (dot é genérico); `d`/`o` vem de rótulo de aresta, linha dupla de `EdgeGeom.total` | fase 2: 3/4 |
 | 2026-10-26 | HANDOFF.md removido (conteúdo incorporado ao trabalho); item pendente do M0 fechado; `SPECS.md` v0.2 commitado | M0 ✅ |
 | 2026-10-26 | M1 iniciado — TDD camada model: testes Red em `tests/model/` | — |
 | 2026-10-26 | M1 model ✅ — `__init_subclass__` + `__set_name__` (não metaclass explícita; decisão do handoff confirmada no código), ids por diagrama (nós e arestas dividem a sequência), E05/E06/E08 | commit `741c098` |

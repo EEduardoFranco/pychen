@@ -11,6 +11,7 @@ from chen.render.shapes import (
     attribute,
     edge,
     entity,
+    isa_triangle,
     relationship,
     weak_entity,
 )
@@ -21,6 +22,12 @@ def _render(fragment, parameters) -> str:
     template = Template(fragment)
     template.load()
     return template.render(parameters)
+
+
+def test_snapshot_fragmento_isa_triangle(snapshot):
+    _, params = isa_triangle(NodeGeom(x=50.0, y=40.0, width=40.0, height=30.0))
+
+    assert _render("IsaTriangle.svg", params) == snapshot
 
 
 def test_snapshot_fragmento_associative(snapshot):

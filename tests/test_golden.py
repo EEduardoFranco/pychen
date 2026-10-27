@@ -18,6 +18,7 @@ from chen import (
     Composite,
     Diagram,
     Entity,
+    ISA,
     Link,
     Owner,
     Relationship,
@@ -109,6 +110,26 @@ def test_golden_v3_serializacao_renderiza_o_mesmo_svg_do_declarado():
     recarregado = Diagram.from_json(declarado.to_json())
 
     assert recarregado.to_svg() == declarado.to_svg()
+
+
+def test_golden_v5_hierarquia_isa(snapshot):
+    """Fase 2 (§10): hierarquia ISA — triângulo, disjunta/sobreposta e total."""
+
+    class Pessoa(Entity):
+        cpf = Attribute(primary_key=True)
+        nome = Attribute()
+
+    class Aluno(Entity):
+        ra = Attribute()
+        isa = ISA(Pessoa, total=False, disjoint=True)
+
+    class Empregado(Entity):
+        matricula = Attribute()
+        isa = ISA(Pessoa, total=True, disjoint=False)
+
+    diagrama = Diagram("Universidade", elements=[Pessoa, Aluno, Empregado])
+
+    assert diagrama.to_svg() == snapshot
 
 
 def test_golden_v4_entidade_associativa(snapshot):

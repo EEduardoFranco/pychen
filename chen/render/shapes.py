@@ -94,6 +94,17 @@ def associative(node: NodeGeom, text: str) -> tuple[str, dict[str, str]]:
     }
 
 
+def isa_triangle(node: NodeGeom) -> tuple[str, dict[str, str]]:
+    """Triângulo de hierarquia ISA (§8): aponta para cima, dentro da geom do nó —
+    sem texto: o rótulo `d`/`o` vive na aresta `isa_super` (EdgeLabel.svg)."""
+    points = (
+        f"{_num(node.x - node.width / 2)},{_num(node.y + node.height / 2)} "
+        f"{_num(node.x + node.width / 2)},{_num(node.y + node.height / 2)} "
+        f"{_num(node.x)},{_num(node.y - node.height / 2)}"
+    )
+    return "IsaTriangle.svg", {"points": points}
+
+
 def attribute(node: NodeGeom, text: str, variant: str = "simple") -> tuple[str, dict[str, str]]:
     filename = ATTRIBUTE_VARIANTS[variant]
     parameters = {

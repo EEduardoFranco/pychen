@@ -9,12 +9,14 @@ from __future__ import annotations
 from chen.layout.dot import compute_layout
 from chen.model.attributes import Attribute, CompositeNode
 from chen.model.entities import WeakEntity
+from chen.model.isa import ISATriangle
 from chen.model.relationships import AssociativeRelationship, Relationship
 from chen.render.shapes import (
     associative,
     attribute,
     edge,
     entity,
+    isa_triangle,
     relationship,
     weak_entity,
 )
@@ -41,7 +43,9 @@ def render_svg(diagram) -> str:
 
     for node in diagram.nodes:
         geometry = layout.nodes[node.obj_id]
-        if isinstance(node, WeakEntity):
+        if isinstance(node, ISATriangle):
+            name, parameters = isa_triangle(geometry)
+        elif isinstance(node, WeakEntity):
             name, parameters = weak_entity(geometry, node.name)
         elif isinstance(node, AssociativeRelationship):
             name, parameters = associative(geometry, node.name)

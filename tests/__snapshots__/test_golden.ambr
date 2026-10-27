@@ -323,3 +323,94 @@
   
   '''
 # ---
+# name: test_golden_v5_hierarquia_isa
+  '''
+  <svg xmlns="http://www.w3.org/2000/svg" width="330.91" height="270.50" viewBox="0 0 330.91 270.50">
+  <g class="edge">
+    <path d="M 43.25,178.52 L 62.22,194.29 L 93.48,220.30 L 113.12,236.63" fill="none" stroke="black" />
+  </g>
+  
+  <g class="edge">
+    <path d="M 109.33,182.09 L 114.07,197.25 L 120.95,219.29 L 125.68,234.45" fill="none" stroke="black" />
+  </g>
+  
+  <g class="edge">
+    <path d="M 171.00,36.19 L 171.00,47.35 L 171.00,61.84 L 171.00,72.97" fill="none" stroke="black" />
+  </g>
+  
+  <g class="edge">
+    <path d="M 173.42,109.19 L 174.99,120.35 L 177.03,134.84 L 178.60,145.97" fill="none" stroke="black" />
+  </g>
+  
+  <g class="edge">
+    <path d="M 171.60,181.27 L 162.77,196.54 L 149.63,219.28 L 140.70,234.71" fill="none" stroke="black" />
+  </g>
+  
+  <g class="edge-label">
+    <text x="163.85" y="208.25" text-anchor="middle" dominant-baseline="middle" font-family="sans-serif" font-size="10">d</text>
+  </g>
+  
+  <g class="edge">
+    <path d="M 277.00,36.19 L 277.00,47.35 L 277.00,61.84 L 277.00,72.97" fill="none" stroke="black" />
+  </g>
+  
+  <g class="edge">
+    <path d="M 275.31,109.19 L 274.20,120.35 L 272.78,134.84 L 271.68,145.97" fill="none" stroke="black" />
+  </g>
+  
+  <g class="edge edge-double">
+    <path d="M 250.67,177.03 L 225.01,193.00 L 179.81,221.12 L 152.91,237.87" fill="none" stroke="black" stroke-width="3.5" />
+    <path d="M 250.67,177.03 L 225.01,193.00 L 179.81,221.12 L 152.91,237.87" fill="none" stroke="white" stroke-width="1.4" />
+  </g>
+  
+  <g class="edge-label">
+    <text x="216.32" y="208.25" text-anchor="middle" dominant-baseline="middle" font-family="sans-serif" font-size="10">o</text>
+  </g>
+  
+  <g class="entity">
+    <rect x="95.00" y="234.50" width="71.99" height="36.00" fill="white" stroke="black" />
+    <text x="131.00" y="252.50" text-anchor="middle" dominant-baseline="middle" font-family="sans-serif" font-size="12">Pessoa</text>
+  </g>
+  
+  <g class="attribute attribute-key">
+    <ellipse cx="27.00" cy="164.00" rx="27.00" ry="18.00" fill="white" stroke="black" />
+    <text x="27.00" y="164.00" text-anchor="middle" dominant-baseline="middle" font-family="sans-serif" font-size="10" text-decoration="underline">cpf</text>
+  </g>
+  
+  <g class="attribute attribute-simple">
+    <ellipse cx="104.00" cy="164.00" rx="31.90" ry="18.00" fill="white" stroke="black" />
+    <text x="104.00" y="164.00" text-anchor="middle" dominant-baseline="middle" font-family="sans-serif" font-size="10">nome</text>
+  </g>
+  
+  <g class="entity">
+    <rect x="137.05" y="73.00" width="67.90" height="36.00" fill="white" stroke="black" />
+    <text x="171.00" y="91.00" text-anchor="middle" dominant-baseline="middle" font-family="sans-serif" font-size="12">Aluno</text>
+  </g>
+  
+  <g class="attribute attribute-simple">
+    <ellipse cx="171.00" cy="18.00" rx="27.00" ry="18.00" fill="white" stroke="black" />
+    <text x="171.00" y="18.00" text-anchor="middle" dominant-baseline="middle" font-family="sans-serif" font-size="10">ra</text>
+  </g>
+  
+  <g class="isa">
+    <polygon points="154.00,182.00 208.00,182.00 181.00,146.00" fill="white" stroke="black" />
+  </g>
+  
+  <g class="entity">
+    <rect x="223.09" y="73.00" width="107.82" height="36.00" fill="white" stroke="black" />
+    <text x="277.00" y="91.00" text-anchor="middle" dominant-baseline="middle" font-family="sans-serif" font-size="12">Empregado</text>
+  </g>
+  
+  <g class="attribute attribute-simple">
+    <ellipse cx="277.00" cy="18.00" rx="46.23" ry="18.00" fill="white" stroke="black" />
+    <text x="277.00" y="18.00" text-anchor="middle" dominant-baseline="middle" font-family="sans-serif" font-size="10">matricula</text>
+  </g>
+  
+  <g class="isa">
+    <polygon points="243.00,182.00 297.00,182.00 270.00,146.00" fill="white" stroke="black" />
+  </g>
+  
+  </svg>
+  
+  '''
+# ---

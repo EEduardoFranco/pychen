@@ -213,6 +213,23 @@ class TestNotacaoFase2:
         # retângulo + losango do mesmo conceito
         assert '<g class="associative">' in svg and "<polygon" in svg
 
+    def test_isa_tem_triangulo_e_linha_dupla_para_superclasse_total(self):
+        from chen.model import ISA
+
+        class Pessoa(Entity):
+            cpf = Attribute(primary_key=True)
+            nome = Attribute()
+
+        class Aluno(Entity):
+            ra = Attribute()
+            isa = ISA(Pessoa, total=True, disjoint=False)
+
+        svg = render_svg(Diagram("U", elements=[Pessoa, Aluno]))
+
+        assert '<g class="isa">' in svg
+        # total → linha dupla na aresta triângulo → superclasse e rótulo "o"
+        assert "edge-double" in svg and ">o<" in svg
+
 
 class TestDeterminismo:
     def test_duas_composicoes_geram_bytes_identicos(self):
