@@ -288,8 +288,8 @@ Infraestrutura mínima para desenvolver com prazer.
 - [x] Pacote `chen/` + `pyproject.toml` (Python ≥ 3.10) com extra `[dev]` + `ruff` + `pytest`
 - [x] Migrar o protótipo (`components.py`, `renderer.py`, `template_loader.py`)
       para `chen/model/` — o código atual vira a base, não é jogado fora
-- [ ] `.agent-playground/` prevista no `.gitignore` — seção 11.3
-      *(pendente: o `.gitignore` atual não a cobre; limpar o `demo.dot` da raiz ao aplicar)*
+- [x] `.agent-playground/` prevista no `.gitignore` — seção 11.3
+      *(fechado na sessão de 2026-10-26: entrada adicionada ao `.gitignore` e `demo.dot` apagado da raiz)*
 
 **DoD:** `pip install -e .` e `pytest` verdes rodando localmente.
 
@@ -460,3 +460,5 @@ de qualquer sessão é **seção 13 + seção 10**.
 | 2026-10-26 | Spec v0.1 criada — decisões de API, layout, escopo, roadmap | — |
 | 2026-10-26 | Spec v0.2 — Zen como filosofia (seção 1), TDD + venv (seção 11), playground (11.3), acompanhamento (11.4) | — |
 | 2026-10-26 | M0 executado pelo agente implementador (git, venv, pacote `chen/`, migração do protótipo) | Pendente: `.agent-playground/` no `.gitignore` e limpeza do `demo.dot` da raiz |
+| 2026-10-26 | HANDOFF.md removido (conteúdo incorporado ao trabalho); item pendente do M0 fechado; `SPECS.md` v0.2 commitado | M0 ✅ |
+| 2026-10-26 | M1 iniciado — TDD camada model: testes Red em `tests/model/` | — |
