@@ -1,4 +1,4 @@
-# chen-diagram-lang
+# pychen
 
 A Python DSL for drawing database conceptual diagrams in **Chen notation**,
 rendered as deterministic SVG.
