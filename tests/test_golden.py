@@ -12,7 +12,17 @@ import shutil
 
 import pytest
 
-from chen import Attribute, Composite, Diagram, Entity, Link, Owner, Relationship, WeakEntity
+from chen import (
+    AssociativeRelationship,
+    Attribute,
+    Composite,
+    Diagram,
+    Entity,
+    Link,
+    Owner,
+    Relationship,
+    WeakEntity,
+)
 
 pytestmark = [
     pytest.mark.requires_dot,
@@ -99,3 +109,28 @@ def test_golden_v3_serializacao_renderiza_o_mesmo_svg_do_declarado():
     recarregado = Diagram.from_json(declarado.to_json())
 
     assert recarregado.to_svg() == declarado.to_svg()
+
+
+def test_golden_v4_entidade_associativa(snapshot):
+    """Fase 2 (§10): entidade associativa — losango dentro de retângulo, com
+    atributos próprios e participando de outro relacionamento."""
+
+    class Cliente(Entity):
+        cpf = Attribute(primary_key=True)
+        nome = Attribute()
+
+    class Produto(Entity):
+        codigo = Attribute(primary_key=True)
+
+    class VendaProduto(AssociativeRelationship):
+        cliente = Link(Cliente, "1")
+        produto = Link(Produto, "N")
+        quantidade = Attribute()
+
+    class Faturada(Relationship):
+        venda = Link(VendaProduto, "N")
+        nota = Link(Cliente, "1")
+
+    diagrama = Diagram("Vendas", elements=[Cliente, Produto, VendaProduto, Faturada])
+
+    assert diagrama.to_svg() == snapshot

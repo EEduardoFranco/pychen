@@ -17,6 +17,8 @@ ATTRIBUTE_VARIANTS = {
 }
 
 INSET = 3.0
+# losango interno da entidade associativa: 60% da geom do nó (§8)
+ASSOCIATIVE_DIAMOND_RATIO = 0.6
 if TYPE_CHECKING:
     from chen.layout.dot import EdgeGeom, NodeGeom
 
@@ -63,6 +65,29 @@ def relationship(node: NodeGeom, text: str) -> tuple[str, dict[str, str]]:
             f"{left_x},{_num(node.y)} {_num(node.x)},{top_y} "
             f"{right_x},{_num(node.y)} {_num(node.x)},{bottom_y}"
         ),
+        "cx": _num(node.x),
+        "cy": _num(node.y),
+        "text": text,
+    }
+
+
+def associative(node: NodeGeom, text: str) -> tuple[str, dict[str, str]]:
+    """Losango dentro de retângulo (§8): retângulo usa a geom cheia do nó; o
+    losango interno é centralizado no mesmo (cx, cy) com 60% da dimensão."""
+    half_diamond_w = node.width * ASSOCIATIVE_DIAMOND_RATIO / 2
+    half_diamond_h = node.height * ASSOCIATIVE_DIAMOND_RATIO / 2
+    points = (
+        f"{_num(node.x - half_diamond_w)},{_num(node.y)} "
+        f"{_num(node.x)},{_num(node.y - half_diamond_h)} "
+        f"{_num(node.x + half_diamond_w)},{_num(node.y)} "
+        f"{_num(node.x)},{_num(node.y + half_diamond_h)}"
+    )
+    return "Associative.svg", {
+        "x": _num(node.x - node.width / 2),
+        "y": _num(node.y - node.height / 2),
+        "w": _num(node.width),
+        "h": _num(node.height),
+        "points": points,
         "cx": _num(node.x),
         "cy": _num(node.y),
         "text": text,

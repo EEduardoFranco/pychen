@@ -7,6 +7,7 @@ templates puros (não exigem `dot`).
 
 from chen.layout.dot import EdgeGeom, NodeGeom
 from chen.render.shapes import (
+    associative,
     attribute,
     edge,
     entity,
@@ -20,6 +21,12 @@ def _render(fragment, parameters) -> str:
     template = Template(fragment)
     template.load()
     return template.render(parameters)
+
+
+def test_snapshot_fragmento_associative(snapshot):
+    _, params = associative(NodeGeom(x=50.0, y=40.0, width=80.0, height=40.0), "VendaProduto")
+
+    assert _render("Associative.svg", params) == snapshot
 
 
 def test_snapshot_fragmento_entity(snapshot):

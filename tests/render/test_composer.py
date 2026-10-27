@@ -191,6 +191,29 @@ class TestNotacaoM2:
         assert svg.count("<ellipse") == 5  # cpf + endereco(mãe) + rua, numero + numero do Outro
 
 
+class TestNotacaoFase2:
+    """Fase 2 (§2/§10): entidade associativa — losango dentro de retângulo."""
+
+    def test_associativa_tem_retangulo_e_losango_interno(self):
+        from chen.model import AssociativeRelationship
+
+        class Cliente(Entity):
+            cpf = Attribute(primary_key=True)
+
+        class Produto(Entity):
+            codigo = Attribute(primary_key=True)
+
+        class VendaProduto(AssociativeRelationship):
+            cliente = Link(Cliente, "1")
+            produto = Link(Produto, "N")
+
+        svg = render_svg(Diagram("Vendas", elements=[Cliente, Produto, VendaProduto]))
+
+        assert '<g class="associative">' in svg
+        # retângulo + losango do mesmo conceito
+        assert '<g class="associative">' in svg and "<polygon" in svg
+
+
 class TestDeterminismo:
     def test_duas_composicoes_geram_bytes_identicos(self):
         primeira = _svg_reduzido()
