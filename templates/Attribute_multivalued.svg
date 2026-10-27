@@ -1,0 +1,5 @@
+<g class="attribute attribute-multivalued">
+  <ellipse cx="{%x%}" cy="{%y%}" rx="{%rx%}" ry="{%ry%}" fill="white" stroke="black" />
+  <ellipse cx="{%x%}" cy="{%y%}" rx="{%rx2%}" ry="{%ry2%}" fill="white" stroke="black" />
+  <text x="{%x%}" y="{%y%}" text-anchor="middle" dominant-baseline="middle" font-family="sans-serif" font-size="10">{%text%}</text>
+</g>

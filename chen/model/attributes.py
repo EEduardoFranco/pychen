@@ -59,6 +59,8 @@ class Attribute:
 class CompositeNode:
     """Nó do grafo para um atributo composto: renderiza como elipse simples (§8)."""
 
+    variant = "simple"
+
     def __init__(self, name: str) -> None:
         self.name = name
         self.obj_id: int = 0

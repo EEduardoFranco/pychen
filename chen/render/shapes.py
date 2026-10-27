@@ -6,7 +6,19 @@ formatada com duas casas — determinismo byte a byte da seção 7 da spec.
 
 from __future__ import annotations
 
-from chen.layout.dot import EdgeGeom, NodeGeom
+from typing import TYPE_CHECKING
+
+ATTRIBUTE_VARIANTS = {
+    "simple": "Attribute.svg",
+    "key": "Attribute_key.svg",
+    "partial_key": "Attribute_partial_key.svg",
+    "multivalued": "Attribute_multivalued.svg",
+    "derived": "Attribute_derived.svg",
+}
+
+INSET = 3.0
+if TYPE_CHECKING:
+    from chen.layout.dot import EdgeGeom, NodeGeom
 
 
 def _num(value: float) -> str:
@@ -19,6 +31,22 @@ def entity(node: NodeGeom, text: str) -> tuple[str, dict[str, str]]:
         "y": _num(node.y - node.height / 2),
         "w": _num(node.width),
         "h": _num(node.height),
+        "cx": _num(node.x),
+        "cy": _num(node.y),
+        "text": text,
+    }
+
+
+def weak_entity(node: NodeGeom, text: str) -> tuple[str, dict[str, str]]:
+    return "WeakEntity.svg", {
+        "x": _num(node.x - node.width / 2),
+        "y": _num(node.y - node.height / 2),
+        "w": _num(node.width),
+        "h": _num(node.height),
+        "x2": _num(node.x - node.width / 2 + INSET),
+        "y2": _num(node.y - node.height / 2 + INSET),
+        "w2": _num(node.width - 2 * INSET),
+        "h2": _num(node.height - 2 * INSET),
         "cx": _num(node.x),
         "cy": _num(node.y),
         "text": text,
@@ -42,19 +70,28 @@ def relationship(node: NodeGeom, text: str) -> tuple[str, dict[str, str]]:
 
 
 def attribute(node: NodeGeom, text: str, variant: str = "simple") -> tuple[str, dict[str, str]]:
-    filename = "Attribute.svg" if variant == "simple" else "Attribute_key.svg"
-    return filename, {
+    filename = ATTRIBUTE_VARIANTS[variant]
+    parameters = {
         "x": _num(node.x),
         "y": _num(node.y),
         "rx": _num(node.width / 2),
         "ry": _num(node.height / 2),
         "text": text,
     }
+    if variant == "multivalued":
+        parameters.update(
+            {
+                "rx2": _num(node.width / 2 - INSET),
+                "ry2": _num(node.height / 2 - INSET),
+            }
+        )
+    return filename, parameters
 
 
 def edge(edge_geom: EdgeGeom) -> list[tuple[str, dict[str, str]]]:
     d = _path_data(edge_geom.points)
-    fragments = [("Edge.svg", {"d": d})]
+    destination = "EdgeDouble.svg" if edge_geom.total else "Edge.svg"
+    fragments = [(destination, {"d": d})]
     if edge_geom.label is not None:
         fragments.append(
             (

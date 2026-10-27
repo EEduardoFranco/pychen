@@ -7,7 +7,7 @@ Regras:
 """
 
 from chen.layout.dot import EdgeGeom, NodeGeom
-from chen.render.shapes import attribute, edge, entity, relationship
+from chen.render.shapes import attribute, edge, entity, relationship, weak_entity
 
 
 class TestEntity:
@@ -79,3 +79,44 @@ class TestEdge:
         assert fragmento_label == "EdgeLabel.svg"
         assert params_label == {"x": "5.00", "y": "2.50", "text": "1"}
         assert params_path["d"] == "M 0.00,0.00 L 10.00,10.00"
+
+    def test_aresta_total_vira_linha_dupla(self):
+        geometria = EdgeGeom(points=((0.0, 0.0), (10.0, 10.5)), total=True)
+
+        [(fragmento, params)] = edge(geometria)
+
+        assert fragmento == "EdgeDouble.svg"
+        assert params["d"] == "M 0.00,0.00 L 10.00,10.50"
+
+
+class TestWeakEntity:
+    def test_entidade_fraca_vira_o_fragmento_WeakEntity_com_retangulo_interno(self):
+        fragmento, params = weak_entity(
+            NodeGeom(x=50.0, y=40.0, width=80.0, height=20.0), "ItemPedido"
+        )
+
+        assert fragmento == "WeakEntity.svg"
+        # retângulo externo e interno afastado 3px nas quatro bordas
+        assert params["x"] == "10.00" and params["y"] == "30.00"
+        assert params["w"] == "80.00" and params["h"] == "20.00"
+        assert params["x2"] == "13.00" and params["y2"] == "33.00"
+        assert params["w2"] == "74.00" and params["h2"] == "14.00"
+        assert params["cx"] == "50.00" and params["cy"] == "40.00"
+        assert params["text"] == "ItemPedido"
+
+
+class TestVarianteMultivaloradaEOutras:
+    def test_variantes_novas_apontam_o_seu_fragmento(self):
+        geometria = NodeGeom(x=20.0, y=10.0, width=30.0, height=12.0)
+
+        assert attribute(geometria, "tel", variant="multivalued")[0] == "Attribute_multivalued.svg"
+        assert attribute(geometria, "tel", variant="derived")[0] == "Attribute_derived.svg"
+        assert attribute(geometria, "tel", variant="partial_key")[0] == "Attribute_partial_key.svg"
+
+    def test_multivalorado_calcula_a_elipse_interna(self):
+        _, params = attribute(
+            NodeGeom(x=20.0, y=10.0, width=30.0, height=12.0), "tel", variant="multivalued"
+        )
+
+        assert params["rx"] == "15.00" and params["ry"] == "6.00"
+        assert params["rx2"] == "12.00" and params["ry2"] == "3.00"

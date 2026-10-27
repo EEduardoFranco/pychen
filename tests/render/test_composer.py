@@ -9,7 +9,16 @@ import shutil
 
 import pytest
 
-from chen.model import Attribute, Diagram, Entity, Link, Relationship
+from chen.model import (
+    Attribute,
+    Composite,
+    Diagram,
+    Entity,
+    Link,
+    Owner,
+    Relationship,
+    WeakEntity,
+)
 from chen.render.composer import render_svg
 
 pytestmark = [
@@ -85,6 +94,98 @@ class TestEscape:
 
         assert "A&lt;B&amp;C" in svg
         assert "A<B&amp;C>" not in svg  # o texto cru não passa
+
+
+class TestNotacaoM2:
+    """Notação intermediária completa na composição (spec §2, §10)."""
+
+    def test_entidade_fraca_vira_retangulo_duplo(self):
+        class Venda(Entity):
+            numero = Attribute(primary_key=True)
+
+        class Item(WeakEntity):
+            da_venda = Owner(Venda)
+            codigo = Attribute(partial_key=True)
+
+        svg = render_svg(Diagram("Itens", elements=[Venda, Item]))
+
+        assert svg.count("<rect") == 3  # 2 da fraca + 1 da forte
+        assert "entity-weak" in svg
+
+    def test_atributo_multivalorado_vira_elipse_dupla(self):
+        class Cliente(Entity):
+            telefones = Attribute(multivalued=True)
+
+        class Outro(Entity):
+            numero = Attribute(primary_key=True)
+
+        class Faz(Relationship):
+            cliente = Link(Cliente, "1")
+            outro = Link(Outro, "N")
+
+        svg = render_svg(Diagram("V", elements=[Cliente, Outro, Faz]))
+
+        assert "attribute-multivalued" in svg
+        assert svg.count('<ellipse cx="') >= 2  # outer + inner da mesma elipse dupla
+
+    def test_atributo_derivado_e_tracejado(self):
+        class Cliente(Entity):
+            cpf = Attribute(primary_key=True)
+
+        class Outro(Entity):
+            numero = Attribute(primary_key=True)
+
+        class Faz(Relationship):
+            cliente = Link(Cliente, "1")
+            outro = Link(Outro, "N")
+            total_do_dia = Attribute(derived=True)
+
+        svg = render_svg(Diagram("V", elements=[Cliente, Outro, Faz]))
+
+        assert "attribute-derived" in svg
+
+    def test_atributo_de_entidade_fraca_tem_sublinhado_tracejado(self):
+        class Venda(Entity):
+            numero = Attribute(primary_key=True)
+
+        class Item(WeakEntity):
+            da_venda = Owner(Venda)
+            codigo = Attribute(partial_key=True)
+
+        svg = render_svg(Diagram("Itens", elements=[Venda, Item]))
+
+        assert "attribute-partial-key" in svg
+
+    def test_participacao_total_vira_linha_dupla(self):
+        class Cliente(Entity):
+            cpf = Attribute(primary_key=True)
+
+        class Pedido(Entity):
+            numero = Attribute(primary_key=True)
+
+        class Faz(Relationship):
+            cliente = Link(Cliente, "1")
+            pedido = Link(Pedido, "N", total=True)
+
+        svg = render_svg(Diagram("V", elements=[Cliente, Pedido, Faz]))
+
+        assert "edge-double" in svg
+
+    def test_atributo_de_entidade_e_composto_ligam_mae_e_filhas(self):
+        class Cliente(Entity):
+            cpf = Attribute(primary_key=True)
+            endereco = Composite(rua=Attribute(), numero=Attribute())
+
+        class Outro(Entity):
+            numero = Attribute(primary_key=True)
+
+        class Faz(Relationship):
+            cliente = Link(Cliente, "1")
+            outro = Link(Outro, "N")
+
+        svg = render_svg(Diagram("V", elements=[Cliente, Outro, Faz]))
+
+        assert svg.count("<ellipse") == 5  # cpf + endereco(mãe) + rua, numero + numero do Outro
 
 
 class TestDeterminismo:

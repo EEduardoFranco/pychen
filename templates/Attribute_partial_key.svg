@@ -1,0 +1,4 @@
+<g class="attribute attribute-partial-key">
+  <ellipse cx="{%x%}" cy="{%y%}" rx="{%rx%}" ry="{%ry%}" fill="white" stroke="black" />
+  <text x="{%x%}" y="{%y%}" text-anchor="middle" dominant-baseline="middle" font-family="sans-serif" font-size="10" style="text-decoration: underline; text-decoration-style: dashed">{%text%}</text>
+</g>

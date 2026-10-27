@@ -7,9 +7,10 @@ na ordem existente no modelo. Números com duas casas; texto escapado no loader.
 from __future__ import annotations
 
 from chen.layout.dot import compute_layout
-from chen.model.attributes import Attribute
+from chen.model.attributes import Attribute, CompositeNode
+from chen.model.entities import WeakEntity
 from chen.model.relationships import Relationship
-from chen.render.shapes import attribute, edge, entity, relationship
+from chen.render.shapes import attribute, edge, entity, relationship, weak_entity
 from chen.render.template_loader import Template
 
 
@@ -33,11 +34,12 @@ def render_svg(diagram) -> str:
 
     for node in diagram.nodes:
         geometry = layout.nodes[node.obj_id]
-        if isinstance(node, Relationship):
+        if isinstance(node, WeakEntity):
+            name, parameters = weak_entity(geometry, node.name)
+        elif isinstance(node, Relationship):
             name, parameters = relationship(geometry, node.name)
-        elif isinstance(node, Attribute):
-            variant = "key" if node.primary_key else "simple"
-            name, parameters = attribute(geometry, node.name, variant)
+        elif isinstance(node, (Attribute, CompositeNode)):
+            name, parameters = attribute(geometry, node.name, variant=node.variant)
         else:
             name, parameters = entity(geometry, node.name)
         segments.append(rendered(name, parameters))
