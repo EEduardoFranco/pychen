@@ -259,10 +259,10 @@ e a promessa de que a API declarativa não muda sem deprecação.
 
 Infraestrutura mínima para desenvolver com prazer.
 
-- [ ] `git init` — repositório **local** (sem remoto; GitHub fica para quando/ se fizer sentido)
-- [ ] Venv **dentro do projeto** (`.venv/`) + `.gitignore` cobrindo `.venv/` e `__pycache__/` — seção 11.1
-- [ ] Pacote `chen/` + `pyproject.toml` (Python ≥ 3.10) com extra `[dev]` + `ruff` + `pytest`
-- [ ] Migrar o protótipo (`components.py`, `renderer.py`, `template_loader.py`)
+- [x] `git init` — repositório **local** (sem remoto; GitHub fica para quando/ se fizer sentido)
+- [x] Venv **dentro do projeto** (`.venv/`) + `.gitignore` cobrindo `.venv/` e `__pycache__/` — seção 11.1
+- [x] Pacote `chen/` + `pyproject.toml` (Python ≥ 3.10) com extra `[dev]` + `ruff` + `pytest`
+- [x] Migrar o protótipo (`components.py`, `renderer.py`, `template_loader.py`)
       para `chen/model/` — o código atual vira a base, não é jogado fora
 
 **DoD:** `pip install -e .` e `pytest` verdes rodando localmente.
