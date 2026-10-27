@@ -119,6 +119,35 @@ class TestComputeLayout:
         assert compute_layout(diagrama) == compute_layout(diagrama)
 
 
+class TestParticipacaoTotal:
+    def test_aresta_carrega_a_participacao_total_do_modelo(self):
+        class Cliente(Entity):
+            cpf = Attribute(primary_key=True)
+
+        class Pedido(Entity):
+            numero = Attribute(primary_key=True)
+
+        class Faz(Relationship):
+            cliente = Link(Cliente, "1")
+            pedido = Link(Pedido, "N", total=True)
+
+        diagrama = Diagram("Vendas", elements=[Cliente, Pedido, Faz])
+
+        layout = compute_layout(diagrama)
+
+        por_par = {(tail, head): geoms for (tail, head), geoms in layout.edges.items()}
+        pedido = [n for n in diagrama.nodes if n.name == "Pedido"][0]
+        [geom_total] = [
+            geom
+            for (tail, head), geoms in por_par.items()
+            if head == pedido.obj_id
+            for geom in geoms
+            if geom.label is not None
+        ]
+
+        assert geom_total.total is True
+
+
 class TestDotNaoEncontrado:
     def test_dot_ausente_levanta_DotNotFound(self, monkeypatch):
         from chen.layout import dot

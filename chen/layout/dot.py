@@ -44,6 +44,7 @@ class EdgeGeom:
     label: str | None = None
     label_x: float = 0.0
     label_y: float = 0.0
+    total: bool = False
 
 
 @dataclass(frozen=True)
@@ -150,6 +151,7 @@ def _parse_json(data: dict, by_pair: dict[tuple[int, int], list[Edge]]) -> Layou
                 label=model_edge.label,
                 label_x=label_x,
                 label_y=ymax - label_y,
+                total=model_edge.total,
             )
         )
 
