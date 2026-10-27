@@ -23,7 +23,14 @@ if TYPE_CHECKING:
 
 
 def validate_diagram(diagram: Diagram) -> None:
-    from chen.model.core import ATTRIBUTED_TO  # isolated import: core importa este módulo
+    from chen.model.core import (  # isolated import: core importa este módulo
+        ATTRIBUTED_TO,
+        LINK,
+        OWNER,
+    )
+
+    ligacoes = [edge for edge in diagram.edges if edge.kind == LINK]
+    donos = [edge for edge in diagram.edges if edge.kind == OWNER]
 
     element_names: list[str] = []
     for node in diagram.nodes:
@@ -31,13 +38,14 @@ def validate_diagram(diagram: Diagram) -> None:
             _validate_attachment(node, diagram.edges, ATTRIBUTED_TO)
         elif isinstance(node, WeakEntity):
             element_names.append(node.name)
-            _validate_weak(node)
+            _validate_weak(node, donos)
         elif isinstance(node, Entity):
             element_names.append(node.name)
             _validate_strong_key(node)
+            _validate_no_owner_on_strong(node, donos)
         else:
             element_names.append(node.name)
-            _validate_rel_links(node)
+            _validate_rel_links(node, ligacoes)
 
     _validate_unique_names(element_names)
 
@@ -71,8 +79,10 @@ def _validate_unique_names(names: list[str]) -> None:
         seen.add(name)
 
 
-def _validate_rel_links(node) -> None:
-    links = type(node).__chen_links__
+def _validate_rel_links(node, ligacoes: list) -> None:
+    # lido do grafo, não das classes da DSL: o modelo carregado por JSON não
+    # tem descritores de classe (decisão de §9, fase 2)
+    links = [edge for edge in ligacoes if edge.tail == node.obj_id]
     if len(links) < 2:
         raise ValidationError(
             "E05",
@@ -80,8 +90,8 @@ def _validate_rel_links(node) -> None:
         )
 
 
-def _validate_weak(weak) -> None:
-    owners = type(weak).__chen_owners__
+def _validate_weak(weak, donos: list) -> None:
+    owners = [edge for edge in donos if edge.head == weak.obj_id]
     if len(owners) != 1:
         raise ValidationError(
             "E04",
@@ -91,4 +101,13 @@ def _validate_weak(weak) -> None:
         raise ValidationError(
             "E03",
             f'weak entity "{weak.name}" requires at least one partial key',
+        )
+
+
+def _validate_no_owner_on_strong(entity, donos: list) -> None:
+    if any(edge.head == entity.obj_id for edge in donos):
+        raise ValidationError(
+            "E04",
+            f'strong entity "{entity.name}" cannot be the target of Owner '
+            "(weak entities own an Owner edge, strong ones never do)",
         )

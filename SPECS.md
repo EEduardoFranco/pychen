@@ -300,14 +300,56 @@ números saem sempre com `f"{v:.2f}"` (determinismo byte a byte da seção 7).
 
 ---
 
-## 9. Serialização (fase 2, decisão antecipada)
+## 9. Serialização (fase 2)
 
 O modelo grafo terá `to_json()` / `from_json()` canônicos:
 
 - Servem para testes dourados, cache e futura CLI (`chen render input.json`).
 - IDs são determinísticos (ordem da lista `elements` + ordem de declaração dos descritores).
-- Formato do JSON será definido na fase 2, mas **nenhum estado visual** entra no modelo —
-  logo, o JSON é só semântica.
+- **Nenhum estado visual entra no modelo — o JSON é só semântica.**
+
+### Formato (definido em 2026-10-27, fase 2)
+
+Grafo plano (dump de nós/arestas, sem conhecimento da DSL — é o modelo imperativo
+prometido em §1.2). Versão explícita em `format: 1`; chaves sempre nesta ordem
+(determinismo byte a byte via `json.dumps(..., sort_keys=False)`):
+
+```json
+{
+  "format": 1,
+  "name": "Vendas",
+  "nodes": [
+    {"obj_id": 1, "kind": "entity", "name": "Cliente"},
+    {"obj_id": 2, "kind": "attribute", "name": "cpf",
+     "flags": {"primary_key": true, "multivalued": false, "derived": false, "partial_key": false}},
+    {"obj_id": 3, "kind": "attribute", "name": "nome"},
+    {"obj_id": 4, "kind": "weak_entity", "name": "ItemPedido"},
+    {"obj_id": 5, "kind": "composite", "name": "endereco"},
+    {"obj_id": 8, "kind": "relationship", "name": "Faz"}
+  ],
+  "edges": [
+    {"obj_id": 7, "kind": "attributed_to", "tail": 2, "head": 1},
+    {"obj_id": 9, "kind": "owner", "tail": 1, "head": 4},
+    {"obj_id": 10, "kind": "link", "tail": 8, "head": 1, "label": "1"},
+    {"obj_id": 11, "kind": "link", "tail": 8, "head": 4, "label": "N", "total": true}
+  ]
+}
+```
+
+Regras do formato:
+
+- `kind` do nó ∈ {`entity`, `weak_entity`, `relationship`, `attribute`, `composite`};
+  `flags` só entra quando algum flag é true (o default é tudo false).
+- Aresta: `label` só entra quando não nulo; `total` só entra quando true.
+- `to_json() -> dict` (ordenado por inserção, canônico). Persistência em texto fica
+  com o chamador (`json.dumps`), pois queremos dict de teste dourado.
+- `from_json(data) -> Diagram` (classmethod): revalida tudo (`validate_diagram`),
+  reatribui ids sequenciais na ordem (nós, depois arestas) e remapeia
+  `tail`/`head` pelos ids originais — JSON lacunado canonicaliza.
+- O round-trip é identidade: `to_json(from_json(to_json(d))) == to_json(d)` e
+  **o diagrama lido renderiza exatamente o mesmo SVG do declarado** (teste dourado).
+- Validação passa a ler do **grafo** (`link`/`owner` contados por arestas), não das
+  classes da DSL — o modelo carregado por JSON não tem descritores de classe.
 
 ---
 
@@ -537,6 +579,8 @@ de qualquer sessão é **seção 13 + seção 10**.
 | 2026-10-27 | M3 model/robustez ✅ — E01/E02/E07 + idempotência (4 diagramas independentes → bytes iguais) + assert da instrução de instalação no `DotNotFound`; 110 testes, cobertura 100% | — |
 | 2026-10-27 | M3 DX ✅ — README (inglês, §12) com quickstart + `examples/{vendas,biblioteca}.py` executáveis e revisados; **nota:** install editável estava stale (finder da 0.0.1 não resolvia `chen` fora da raiz) — re `pip install -e ".[dev]"` resolveu; a sanidade da §11.1 (dois comandos, do zero) continua valendo | — |
 | 2026-10-27 | **Fase 1 fechada** — v1.0.0, tag `1.0.0`; promessa: API declarativa não muda sem deprecação. PyPI: **não publicar** (decisão do usuário); push no GitHub (perfil `EEduardoFranco`) será feito por agente designado — o repo ainda não tem remoto | fase 1 ✅ |
+| 2026-10-27 | Fase 2 aberta (0.4.x). §9 formatado: grafo plano, `format: 1`, ids = posições canônicas (nós 1..N, arestas N+1..), omissão de flags/label/total quando default; `from_json` revalida e re-atribui — round-trip por construção + golden v3 (JSON → SVG == SVG declarado) | — |
+| 2026-10-27 | Refactor do validador: E03–E05 agora leem do **grafo** (contagem de arestas `link`/`owner`), não dos descritores de classe — o modelo carregado por JSON também obedece; nova checagem: `owner` apontando para entidade forte → E04 | — |
 | 2026-10-26 | HANDOFF.md removido (conteúdo incorporado ao trabalho); item pendente do M0 fechado; `SPECS.md` v0.2 commitado | M0 ✅ |
 | 2026-10-26 | M1 iniciado — TDD camada model: testes Red em `tests/model/` | — |
 | 2026-10-26 | M1 model ✅ — `__init_subclass__` + `__set_name__` (não metaclass explícita; decisão do handoff confirmada no código), ids por diagrama (nós e arestas dividem a sequência), E05/E06/E08 | commit `741c098` |

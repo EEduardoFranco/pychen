@@ -154,6 +154,35 @@ class Diagram:
             f'entity "{target.__name__}" referenced in Link/Owner is not in the diagram elements',
         )
 
+    @classmethod
+    def _load(cls, name: str, nodes: list, edges: list[Edge]) -> Diagram:
+        """Construção imperativa usada pela serialização (spec §9).
+
+        Recebe o estado pronto (nós com attributes já anexados, edges com ids
+        atribuídos) e pula `__init__`/`_build` — o formato declarativo por cima,
+        o imperativo por baixo (§1.2).
+        """
+        self = cls.__new__(cls)
+        self.name = name
+        self.elements = []
+        self.nodes = nodes
+        self.edges = edges
+        self._ids = Identifier()
+        return self
+
+    def to_json(self) -> dict:
+        """Serialização canônica do modelo (spec §9). Módulo lazy: core é o grafo puro."""
+        from chen.model.serialize import to_json as dump  # isolated import
+
+        return dump(self)
+
+    @classmethod
+    def from_json(cls, data: dict) -> Diagram:
+        """Reconstrói e revalida um diagrama do dump canônico (spec §9)."""
+        from chen.model.serialize import from_json as load  # isolated import
+
+        return load(data)
+
     def to_svg(self) -> str:
         """Renderiza o diagrama (spec §4). Render importa lazy: camada acima do model."""
         from chen.render.composer import render_svg  # isolated import

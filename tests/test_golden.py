@@ -65,3 +65,37 @@ def test_golden_v2_exemplo_canonico_completo(snapshot):
     diagrama = Diagram("Vendas", elements=[Cliente, Pedido, ItemPedido, Faz])
 
     assert diagrama.to_svg() == snapshot
+
+
+def test_golden_v3_serializacao_renderiza_o_mesmo_svg_do_declarado():
+    """§9, fase 2: o diagrama lido do dump canônico é o mesmo diagrama — o SVG
+    dele é byte a byte o do declarado (round-trip fino, do JSON ao pixel)."""
+
+    class Cliente(Entity):
+        cpf = Attribute(primary_key=True)
+        nome = Attribute()
+        telefones = Attribute(multivalued=True)
+        endereco = Composite(
+            rua=Attribute(),
+            numero=Attribute(),
+            cidade=Attribute(),
+        )
+
+    class Pedido(Entity):
+        numero = Attribute(primary_key=True)
+        data_emissao = Attribute(derived=True)
+
+    class ItemPedido(WeakEntity):
+        owner = Owner(Pedido)
+        codigo = Attribute(partial_key=True)
+        quantidade = Attribute()
+
+    class Faz(Relationship):
+        cliente = Link(Cliente, "1")
+        pedido = Link(Pedido, "N", total=True)
+        valor_total = Attribute(derived=True)
+
+    declarado = Diagram("Vendas", elements=[Cliente, Pedido, ItemPedido, Faz])
+    recarregado = Diagram.from_json(declarado.to_json())
+
+    assert recarregado.to_svg() == declarado.to_svg()
