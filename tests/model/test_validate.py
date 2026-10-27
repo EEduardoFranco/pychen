@@ -5,7 +5,16 @@
 import pytest
 
 from chen.exceptions import ValidationError
-from chen.model import Attribute, Diagram, Entity, Link, Owner, Relationship, WeakEntity
+from chen.model import (
+    Attribute,
+    Composite,
+    Diagram,
+    Entity,
+    Link,
+    Owner,
+    Relationship,
+    WeakEntity,
+)
 
 
 class TestE05RelacionamentoComMenosDeDuasEntidades:
@@ -89,3 +98,137 @@ class TestCasoFelizValido:
         diagrama = Diagram("Vendas", elements=[Cliente, Pedido, Faz])
 
         assert diagrama.name == "Vendas"
+
+
+class TestE01AtributoDeclaradoNuncaAnexado:
+    """E01 na DSL declarativa é impossível por construção (todo descritor coletado
+    é anexado); a regra vive no modelo puro e protege futuros consumidores de estado
+    (serialização, fase 2). O teste materializa o estado pendente ao nível do modelo."""
+
+    def test_atributo_sem_aresta_de_anexo_levanta_E01(self):
+        from chen.model.core import ATTRIBUTED_TO
+        from chen.model.validate import validate_diagram
+
+        class Cliente(Entity):
+            cpf = Attribute(primary_key=True)
+            nome = Attribute()
+
+        class Pedido(Entity):
+            numero = Attribute(primary_key=True)
+
+        class Faz(Relationship):
+            cliente = Link(Cliente, "1")
+            pedido = Link(Pedido, "N")
+
+        diagrama = Diagram("Vendas", elements=[Cliente, Pedido, Faz])
+
+        # a serialização da fase 2 pode produzir estado sem uma aresta de anexo
+        aresta_cpf = [
+            e
+            for e in diagrama.edges
+            if e.kind == ATTRIBUTED_TO and e.tail == 2  # cpf é o nó de id 2
+        ]
+        diagrama.edges.remove(aresta_cpf[0])
+
+        with pytest.raises(ValidationError, match="E01"):
+            validate_diagram(diagrama)
+
+
+class TestE02EntidadeForteSemChave:
+    def test_entidade_forte_sem_chave_emite_warning_E02(self):
+        class Cliente(Entity):
+            nome = Attribute()
+            idade = Attribute()
+
+        with pytest.warns(UserWarning, match="E02"):
+            Diagram("Vendas", elements=[Cliente])
+
+    def test_e02_aponta_a_entidade_culpada(self):
+        class Cliente(Entity):
+            class Meta:
+                name = "ClienteSemCpf"
+
+            nome = Attribute()
+
+        with pytest.warns(UserWarning, match="ClienteSemCpf"):
+            Diagram("Vendas", elements=[Cliente])
+
+    def test_entidade_forte_com_chave_nao_emite_warning(self):
+        import warnings
+
+        class Cliente(Entity):
+            cpf = Attribute(primary_key=True)
+
+        with warnings.catch_warnings():
+            warnings.simplefilter("error")  # qualquer warning falha o teste
+            Diagram("Vendas", elements=[Cliente])
+
+    def test_entidade_fraca_e_isentada_do_E02(self):
+        class Pedido(Entity):
+            numero = Attribute(primary_key=True)
+
+        class Item(WeakEntity):
+            do_pedido = Owner(Pedido)
+            codigo = Attribute(partial_key=True)
+
+        import warnings
+
+        with warnings.catch_warnings():
+            warnings.simplefilter("error")
+            Diagram("Vendas", elements=[Pedido, Item])
+
+
+class TestE07NomesDuplicados:
+    def test_mesma_classe_repetida_na_lista_gera_E07(self):
+        class Cliente(Entity):
+            cpf = Attribute(primary_key=True)
+
+        class Outro(Entity):
+            numero = Attribute(primary_key=True)
+
+        class Faz(Relationship):
+            cliente = Link(Cliente, "1")
+            outro = Link(Outro, "N")
+
+        with pytest.raises(ValidationError, match="E07"):
+            Diagram("Vendas", elements=[Cliente, Cliente, Outro, Faz])
+
+    def test_classes_distintas_com_o_mesmo_nome_geram_E07(self):
+        class Cliente(Entity):
+            cpf = Attribute(primary_key=True)
+
+        class Outro(Entity):
+            numero = Attribute(primary_key=True)
+
+        class Faz(Relationship):
+            cliente = Link(Cliente, "1")
+            outro = Link(Outro, "N")
+
+        class Rebautizada(Entity):
+            class Meta:
+                name = "Cliente"
+
+            cpf_re = Attribute(primary_key=True)
+
+        class OutroCruza(Relationship):
+            cliente_um = Link(Outro, "1")
+            cliente_dois = Link(Rebautizada, "N")
+
+        with pytest.raises(ValidationError, match="E07"):
+            Diagram("Vendas", elements=[Cliente, Outro, Faz, Rebautizada, OutroCruza])
+
+    def test_nomes_de_atributos_repetidos_nao_sao_E07(self):
+        # nome de atributo é local (filhos de compostos repetem por natureza);
+        # E07 vale para entidades e relacionamentos (anotação em §6)
+        class Cliente(Entity):
+            cpf = Attribute(primary_key=True)
+            endereco = Composite(rua=Attribute(), numero=Attribute())
+
+        class Outro(Entity):
+            numero = Attribute(primary_key=True)
+
+        class Faz(Relationship):
+            cliente = Link(Cliente, "1")
+            outro = Link(Outro, "N")
+
+        Diagram("Vendas", elements=[Cliente, Outro, Faz])  # caso feliz

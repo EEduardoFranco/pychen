@@ -154,5 +154,5 @@ class TestDotNaoEncontrado:
 
         monkeypatch.setattr(dot, "_resolve_dot", lambda: None)
 
-        with pytest.raises(DotNotFound):
+        with pytest.raises(DotNotFound, match="graphviz.org/download"):
             dot.compute_layout(_vendas_diagrama())

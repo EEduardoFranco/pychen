@@ -81,6 +81,8 @@ class TestEscape:
             class Meta:
                 name = "A<B&C"
 
+            cpf = Attribute(primary_key=True)
+
         class Pedido(Entity):
             numero = Attribute(primary_key=True)
 
@@ -114,6 +116,7 @@ class TestNotacaoM2:
 
     def test_atributo_multivalorado_vira_elipse_dupla(self):
         class Cliente(Entity):
+            cpf = Attribute(primary_key=True)
             telefones = Attribute(multivalued=True)
 
         class Outro(Entity):

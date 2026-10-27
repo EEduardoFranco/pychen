@@ -323,6 +323,7 @@ e o roadmap reflete o estado real do trabalho (11.4). Checkbox é registro, não
 Infraestrutura mínima para desenvolver com prazer.
 
 - [x] `git init` — repositório **local** (sem remoto; GitHub fica para quando/ se fizer sentido)
+      *(registrado em §13: push futuro designado para o perfil `EEduardoFranco`, email `dudufranco25@gmail.com`)*
 - [x] Venv **dentro do projeto** (`.venv/`) + `.gitignore` cobrindo `.venv/` e `__pycache__/` — seção 11.1
 - [x] Pacote `chen/` + `pyproject.toml` (Python ≥ 3.10) com extra `[dev]` + `ruff` + `pytest`
 - [x] Migrar o protótipo (`components.py`, `renderer.py`, `template_loader.py`)
@@ -516,6 +517,8 @@ de qualquer sessão é **seção 13 + seção 10**.
 | 2026-10-27 | M2 layout ✅ — `EdgeGeom.total` propagado do modelo | — |
 | 2026-10-27 | M2 render ✅ — fragments `WeakEntity`/`Attribute_partial_key`/`Attribute_multivalued`/`Attribute_derived`/`EdgeDouble` (linha dupla = stroke grosso preto + stroke fino branco sobre os mesmos pontos); 11 snapshots por variante em `tests/render/test_snapshots.py` (não exigem `dot`) | — |
 | 2026-10-27 | M2 ✅ DoD verificado — golden v2 (exemplo canônico completo do §4) gerado e revisado; v0.2.0 | M2 fechado |
+| 2026-10-27 | M3 iniciado (fase que fecha a fase 1). Decisões do usuário: **não publicar no PyPI ainda**; push futuro no GitHub sob o perfil **EEduardoFranco** (email `dudufranco25@gmail.com`) — identidade git do repo já apontada; a macro `HANDOFF` continua desativada (estado mora aqui) | — |
+| 2026-10-27 | TDD camada model: E01 (invariante do modelo), E02 (warning), E07 (nomes de topo) | — |
 | 2026-10-26 | HANDOFF.md removido (conteúdo incorporado ao trabalho); item pendente do M0 fechado; `SPECS.md` v0.2 commitado | M0 ✅ |
 | 2026-10-26 | M1 iniciado — TDD camada model: testes Red em `tests/model/` | — |
 | 2026-10-26 | M1 model ✅ — `__init_subclass__` + `__set_name__` (não metaclass explícita; decisão do handoff confirmada no código), ids por diagrama (nós e arestas dividem a sequência), E05/E06/E08 | commit `741c098` |

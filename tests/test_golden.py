@@ -65,4 +65,3 @@ def test_golden_v2_exemplo_canonico_completo(snapshot):
     diagrama = Diagram("Vendas", elements=[Cliente, Pedido, ItemPedido, Faz])
 
     assert diagrama.to_svg() == snapshot
-
